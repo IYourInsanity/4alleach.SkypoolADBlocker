@@ -17,7 +17,6 @@ export default class MainScriptInstallService extends Service
 
         this.install = this.install.bind(this);
         this.installInternal = this.installInternal.bind(this);
-        this.setupFrameId = this.setupFrameId.bind(this);
     }
 
     public initialize(): void 
@@ -39,7 +38,7 @@ export default class MainScriptInstallService extends Service
 
         return new Promise<boolean>(setupFrameIdResolve => 
         {
-            $this.setupFrameId(tabId, frameId);
+            $this.installFrame(tabId, frameId);
 
             setupFrameIdResolve(true);
         });
@@ -96,11 +95,11 @@ export default class MainScriptInstallService extends Service
         }, 100);
     }
 
-    private setupFrameId(tabId: number, frameId: number): void
+    private installFrame(tabId: number, frameId: number): void
     {
-        const document_setupFrameId = function(frameId: number): void
+        const document_installFrame = function(frameId: number): void
         {
-            (document as CEDocument).API.setupFrameId(frameId);
+            (document as CEDocument).API.installFrame(frameId);
         }
 
         chrome.scripting.executeScript({
@@ -109,7 +108,7 @@ export default class MainScriptInstallService extends Service
                 frameIds: [frameId]
             },
             world: 'MAIN',
-            func: document_setupFrameId,
+            func: document_installFrame,
             args: [frameId]
         })
         .catch(reason => 

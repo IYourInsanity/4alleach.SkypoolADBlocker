@@ -2,21 +2,19 @@ import Guid from "../../../../common/model/Guid";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
 import CEDocument from "../../global/CEDocument";
-import CECommand from "../../model/CECommand";
-import MainEventController from "./MainEventController";
+import IWindowEventControllerService from "./abstraction/IWindowEventControllerService";
 
-export default class WindowEventControllerService extends Service
+export default class WindowEventControllerService extends Service implements IWindowEventControllerService
 {
     public static readonly key: string = Guid.new();
 
     private CEDocument: CEDocument;
-    private controller: MainEventController;
 
     constructor(serviceHub: IServiceHub)
     {
         super(WindowEventControllerService.key, serviceHub);
 
-        this.unload = this.unload.bind(this);
+        this.befounload = this.befounload.bind(this);
     }
 
     public initialize(): void 
@@ -25,13 +23,12 @@ export default class WindowEventControllerService extends Service
         this.isWork = true;
 
         this.CEDocument = document as CEDocument;
-        this.controller = this.serviceHub?.get<MainEventController>(MainEventController)!;
 
-        window.addEventListener('unload', this.unload, { once: true });
+        //window.addEventListener('beforunload', this.befounload, true);
     }
 
-    private unload(event: Event): void
+    private befounload(event: Event): void
     {
-        this.controller.send({ Type: CECommand.MainScriptInstalled, Data: { } });
+        this.CEDocument.API.uninstallFrame();
     }
 }

@@ -2,15 +2,15 @@ import Guid from "../../../../common/model/Guid";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import CECommandGenerator from "../../helper/CECommandGenerator";
 import CECommand from "../../model/CECommand";
-import DocumentEventController from "../../service/DocumentEventController";
+import DocumentEventControllerService from "../../service/DocumentEventControllerService";
 
-export default class MainEventController extends DocumentEventController
+export default class MainEventControllerService extends DocumentEventControllerService
 {
     public static key: string = Guid.new();
 
     constructor()
     {
-        super(MainEventController.key);
+        super(MainEventControllerService.key);
     }
 
     public override initialize(): void 
@@ -18,7 +18,7 @@ export default class MainEventController extends DocumentEventController
         if(this.isWork === true) return;
         this.isWork = true;
 
-        window.addEventListener(CECommand.MessageToMain, this.receiveInternal);
+        window.addEventListener(CECommand.MessageToMain, this.receiveCustomEvent);
     }
 
     public override receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void 

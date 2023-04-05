@@ -1,7 +1,7 @@
 import Guid from "../../../common/model/Guid";
 import Startup from "../../../framework/entry/Startup";
 import { IConfiguration } from "../../../framework/entry/abstraction/IConfiguration";
-import ContentEventController from "./service/ContentEventController";
+import ContentEventControllerService from "./service/ContentEventControllerService";
 import ContentMessageHandlerService from "./service/ContentMessageHandlerService";
 
 const config: IConfiguration = 
@@ -19,7 +19,7 @@ export default class ContentStartup extends Startup<IConfiguration>
 
     protected configure(config: IConfiguration): void 
     {
-        this.serviceHub.register(ContentEventController);
+        this.serviceHub.register(ContentEventControllerService);
         this.serviceHub.register(ContentMessageHandlerService);
         this.serviceHub.initialize();
 

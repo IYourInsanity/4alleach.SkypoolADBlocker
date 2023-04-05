@@ -3,20 +3,22 @@ import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
 import CEDocument from "../../global/CEDocument";
 import CECommand from "../../model/CECommand";
-import MainEventController from "./MainEventController";
+import MainEventControllerService from "./MainEventControllerService";
+import ICEDocumentControllerService from "./abstraction/ICEDocumentControllerService";
 
-export default class CEDocumentControllerService extends Service
+export default class CEDocumentControllerService extends Service implements ICEDocumentControllerService
 {
     public static readonly key: string = Guid.new();
 
     private CEDocument: CEDocument;
-    private controller: MainEventController;
+    private controller: MainEventControllerService;
 
     constructor(serviceHub: IServiceHub)
     {
         super(CEDocumentControllerService.key, serviceHub);
 
-        this.setupFramId = this.setupFramId.bind(this);
+        this.installFrame = this.installFrame.bind(this);
+        this.uninstallFrame = this.uninstallFrame.bind(this);
     }
 
     public initialize(): void 
@@ -27,16 +29,21 @@ export default class CEDocumentControllerService extends Service
         this.CEDocument = document as CEDocument;
         this.CEDocument.API = 
         {
-            setupFrameId: this.setupFramId
+            installFrame: this.installFrame,
+            uninstallFrame: this.uninstallFrame
         };
 
-        this.controller = this.serviceHub?.get<MainEventController>(MainEventController)!;
+        this.controller = this.serviceHub?.get<MainEventControllerService>(MainEventControllerService)!;
     }
 
-    private setupFramId(frameId: number): void
+    private installFrame(frameId: number): void
     {
         this.CEDocument.FrameId = frameId;
         this.controller.send({ Type: CECommand.MainScriptInstalled, Data: { } });
     }
 
+    private uninstallFrame(): void
+    {
+        this.controller.send({ Type: CECommand.MainScriptUninstalled, Data: { } });
+    }
 }

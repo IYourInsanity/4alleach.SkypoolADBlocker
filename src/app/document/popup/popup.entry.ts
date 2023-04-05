@@ -1,12 +1,9 @@
 import Guid from "../../../common/model/Guid";
 import Startup from "../../../framework/entry/Startup";
 import { IConfiguration } from "../../../framework/entry/abstraction/IConfiguration";
-import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import NodeRenderManager from "./manager/NodeRenderManager";
 import PageManager from "./manager/PageManager";
-import PopupEventController from "./service/PopupEventController";
-import CECommandGenerator from "../helper/CECommandGenerator";
-import CECommand from "../model/CECommand";
+import PopupEventControllerService from "./service/PopupEventControllerService";
 
 const config: IConfiguration = 
 {
@@ -23,7 +20,7 @@ export default class PopupStartup extends Startup<IConfiguration>
 
     protected configure(config: IConfiguration): void 
     {
-        this.serviceHub.register(PopupEventController);
+        this.serviceHub.register(PopupEventControllerService);
 
         const pageManager = new PageManager();
         pageManager.initialize();
