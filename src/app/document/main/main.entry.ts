@@ -26,7 +26,6 @@ export default class MainStartup extends Startup<IConfiguration>
         serviceHub.register(CEDocumentControllerService);
         serviceHub.register(MainEventControllerService);
         
-
         serviceHub.initialize();
         
         //TODO Initialize Services, Managers and etc.

@@ -29,7 +29,7 @@ export abstract class EventController<TData, TSender> extends Service implements
             listener = this.listeners[key];
         }
 
-        if(listener.indexOf(callback) !== -1)
+        if(listener.indexOf(callback) > -1)
         {
             return;
         }
