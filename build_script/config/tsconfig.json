@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "react",
+    "module": "es6",
+    "target": "es6",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "types": [ "chrome" ]
+  },
+  "include": ["../../src/**/*"]
+}

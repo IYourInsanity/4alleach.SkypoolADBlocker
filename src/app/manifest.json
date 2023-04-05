@@ -1,0 +1,65 @@
+{
+  "name": "React extension",
+  "version": "1.0",
+  "version_name": "1.0 Alpha",
+  "manifest_version": 3,
+  "offline_enabled": true,
+  "incognito": "split",
+  "description": "",
+  "author": "4alleach",
+  "icons": {
+    "16": "./asset/images/icon16.png",
+    "48": "./asset/images/icon48.png",
+    "128": "./asset/images/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';",
+    "sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-eval'; object-src 'self';"
+  },
+  "background": {
+    "service_worker": "./src/backend.js"
+  },
+  "content_scripts": [
+    {
+      "run_at": "document_start",
+      "all_frames": true,
+      "js": [
+        "./src/content.js"
+      ],
+      "matches": [
+        "file://*/*",
+        "http://*/*",
+        "https://*/*"
+      ],
+      "match_about_blank": true
+    }
+  ],
+  "action":{
+    "default_title": "Click me",
+    "default_popup": "src/popup.html"
+  },
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "cookies",
+    "debugger",
+    "management",
+    "nativeMessaging",
+    "notifications",
+    "unlimitedStorage",
+    "tabs",
+    "webNavigation",
+    "scripting",
+    "system.display",
+    "tabCapture"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [ "src/main.js" ],
+      "matches": [ "<all_urls>" ]
+    }
+  ]
+}
