@@ -41,7 +41,7 @@ export default class TabStateService extends Service
         this.eventController = this.serviceHub?.get<BackendEventControllerService>(BackendEventControllerService)!;
         
         chrome.tabs.onCreated.addListener(this.onCreated);
-        chrome.tabs.onUpdated.addListener(this.onUpdated);
+        //chrome.tabs.onUpdated.addListener(this.onUpdated);
         chrome.tabs.onRemoved.addListener(this.onRemoved);
 
         chrome.webNavigation.onCommitted.addListener(this.onCommited);
@@ -49,19 +49,23 @@ export default class TabStateService extends Service
 
     private receive(event: { Type: string, Data: any }, sender: chrome.runtime.MessageSender): void
     {
+        const tabId = sender.tab!.id!;
+        const frameId = sender.frameId!;
+
         switch(event.Type)
         {
             case CECommand.MainScriptInstalled:
 
-                const tabId = sender.tab!.id!;
-                const frameId = sender.frameId!;
+                this.tabs[tabId].Frames[frameId] = { State: FrameState.Loaded, MainScriptInstalled: true };
 
-                const frameInfo = this.tabs[tabId].Frames[frameId];
-                
-                frameInfo.MainScriptInstalled = true;
-                frameInfo.State = FrameState.Loaded;
+                GlobalLogger.log('CECommand.MainScriptInstalled', this.tabs, sender);
 
-                GlobalLogger.log('CECommand.MainScriptInstalled', frameInfo, sender);
+                break;
+            case CECommand.MainScriptUninstalled:
+
+                delete this.tabs[tabId].Frames[frameId];
+
+                GlobalLogger.log('CECommand.MainScriptUninstalled', this.tabs, sender);
 
                 break;
         }
@@ -75,7 +79,7 @@ export default class TabStateService extends Service
 
         this.tabs[tab.id!] = {
             State: TabState.Created,
-            Frames: []
+            Frames: {}
         };
 
         this.eventController.add(tabId, this.receive);
@@ -126,23 +130,21 @@ export default class TabStateService extends Service
             return;
         }
 
-        const tab = this.tabs[tabId];
+        /*const tab = this.tabs[tabId];
 
         if(tab === undefined)
         {
-            GlobalLogger.error('Tab not exist in storage', tabId);
+            GlobalLogger.error('Tab not exist in storage', details);
             return;
         }
 
         if(tab.Frames[frameId] !== undefined)
         {
-            GlobalLogger.error('Frame arleady exist in storage', tab, frameId);
+            GlobalLogger.error('Frame arleady exist in storage', details);
             return;
         }
 
-        tab.Frames[frameId] = { State: FrameState.Commited };
-
-        GlobalLogger.log('Storage', this.tabs);
+        tab.Frames[frameId] = { State: FrameState.Commited };*/
     }
 
     //#endregion

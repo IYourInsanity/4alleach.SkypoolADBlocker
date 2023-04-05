@@ -8,4 +8,5 @@ export default class CECommand
     public static Ping: string = `ce-commmand-ping`;
 
     public static MainScriptInstalled: string = 'ce-command-main-script-installed';
+    public static MainScriptUninstalled: string = 'ce-command-main-script-uninstalled';
 }

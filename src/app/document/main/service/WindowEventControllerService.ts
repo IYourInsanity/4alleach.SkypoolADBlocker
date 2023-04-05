@@ -5,7 +5,7 @@ import CEDocument from "../../global/CEDocument";
 import CECommand from "../../model/CECommand";
 import MainEventController from "./MainEventController";
 
-export default class CEDocumentControllerService extends Service
+export default class WindowEventControllerService extends Service
 {
     public static readonly key: string = Guid.new();
 
@@ -14,9 +14,9 @@ export default class CEDocumentControllerService extends Service
 
     constructor(serviceHub: IServiceHub)
     {
-        super(CEDocumentControllerService.key, serviceHub);
+        super(WindowEventControllerService.key, serviceHub);
 
-        this.setupFramId = this.setupFramId.bind(this);
+        this.unload = this.unload.bind(this);
     }
 
     public initialize(): void 
@@ -25,18 +25,13 @@ export default class CEDocumentControllerService extends Service
         this.isWork = true;
 
         this.CEDocument = document as CEDocument;
-        this.CEDocument.API = 
-        {
-            setupFrameId: this.setupFramId
-        };
-
         this.controller = this.serviceHub?.get<MainEventController>(MainEventController)!;
+
+        window.addEventListener('unload', this.unload, { once: true });
     }
 
-    private setupFramId(frameId: number): void
+    private unload(event: Event): void
     {
-        this.CEDocument.FrameId = frameId;
         this.controller.send({ Type: CECommand.MainScriptInstalled, Data: { } });
     }
-
 }

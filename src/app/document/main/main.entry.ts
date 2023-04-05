@@ -3,6 +3,7 @@ import Startup from "../../../framework/entry/Startup";
 import { IConfiguration } from "../../../framework/entry/abstraction/IConfiguration";
 import CEDocumentControllerService from "./service/CEDocumentControllerService";
 import MainEventController from "./service/MainEventController";
+import WindowEventControllerService from "./service/WindowEventControllerService";
 
 const config: IConfiguration = 
 {
@@ -22,7 +23,8 @@ export default class MainStartup extends Startup<IConfiguration>
         const serviceHub = this.serviceHub;
 
         serviceHub.register(CEDocumentControllerService);
-        serviceHub.register(MainEventController);  
+        serviceHub.register(MainEventController);
+        serviceHub.register(WindowEventControllerService);
 
         serviceHub.initialize();
         
