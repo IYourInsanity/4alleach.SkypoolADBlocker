@@ -2,16 +2,17 @@ import Guid from "../../../common/model/Guid";
 import Service from "../../../framework/service/Service";
 import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
 import CECommand from "../../document/model/CECommand";
-import { FrameInfo, FrameState } from "../model/Tab/FrameInfo";
-import { TabInfo, TabState } from "../model/Tab/TabInfo";
+import { FrameInfo, FrameState } from "../model/tab/FrameInfo";
+import { TabInfo, TabState } from "../model/tab/TabInfo";
 import BackendEventControllerService from "./BackendEventControllerService";
 import MainScriptInstallService from "./MainScriptInstallService";
 import UrlService from "./UrlService";
 import IBackendEventControllerService from "./abstraction/IBackendEventControllerService";
 import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
+import ITabStateService from "./abstraction/ITabStateService";
 import IUrlService from "./abstraction/IUrlService";
 
-export default class TabStateService extends Service
+export default class TabStateService extends Service implements ITabStateService
 {
     public static key: string = Guid.new();
 
@@ -21,17 +22,22 @@ export default class TabStateService extends Service
     private urlService: IUrlService;
     private installService: IMainScriptInstallService;
 
+    private activeTabId: number;
+
     constructor(serviceHub: IServiceHub)
     {
         super(TabStateService.key, serviceHub);
 
         this.tabs = {};
+        this.activeTabId = 0;
 
         this.receive = this.receive.bind(this);
+        this.getActiveTabId = this.getActiveTabId.bind(this);
 
         this.onCreated = this.onCreated.bind(this);
         this.onUpdated = this.onUpdated.bind(this);
         this.onRemoved = this.onRemoved.bind(this);
+        this.onSwitched = this.onSwitched.bind(this);
 
         this.onCommited = this.onCommited.bind(this);
     }
@@ -46,11 +52,17 @@ export default class TabStateService extends Service
         this.installService = this.serviceHub.get<IMainScriptInstallService>(MainScriptInstallService);
         this.urlService = this.serviceHub.get<IUrlService>(UrlService);
         
+        chrome.tabs.onActivated.addListener(this.onSwitched);
         chrome.tabs.onCreated.addListener(this.onCreated); 
         chrome.tabs.onUpdated.addListener(this.onUpdated);
         chrome.tabs.onRemoved.addListener(this.onRemoved);
 
         chrome.webNavigation.onCommitted.addListener(this.onCommited);
+    }
+
+    public getActiveTabId(): number 
+    {
+        return this.activeTabId;
     }
 
     private receive(event: { Type: string, Data: any }, sender: chrome.runtime.MessageSender): void
@@ -119,8 +131,26 @@ export default class TabStateService extends Service
         }
     }
 
+    private async onSwitched(info: chrome.tabs.TabActiveInfo): Promise<void>
+    {
+        const tab = await chrome.tabs.get(info.tabId);
+        const url = tab.url!;
+
+        /*if(this.urlService.validate(url) === false)
+        {
+            return;
+        }*/
+
+        this.activeTabId = info.tabId;
+    }
+
     private async onCommited(details: chrome.webNavigation.WebNavigationFramedCallbackDetails, filters?: chrome.webNavigation.WebNavigationFramedCallbackDetails | undefined): Promise<void>
     {
+        if(this.activeTabId === 0)
+        {
+            this.activeTabId = details.tabId;
+        }
+
         const url = details.url;
 
         if(this.urlService.validate(url) === false)

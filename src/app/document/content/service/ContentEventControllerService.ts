@@ -8,9 +8,13 @@ export default class ContentEventControllerService extends DocumentEventControll
 {
     public static key: string = Guid.new();
 
+    private port: chrome.runtime.Port;
+
     constructor()
     {
         super(ContentEventControllerService.key);
+
+        this.receiveBackendEvent = this.receiveBackendEvent.bind(this);
     }
 
     public override initialize(): void 
@@ -19,10 +23,13 @@ export default class ContentEventControllerService extends DocumentEventControll
 
         this.isWork = true;
 
+        this.port = chrome.runtime.connect({ name: Guid.new() });
+        this.port.onMessage.addListener(this.receiveBackendEvent);
+
         window.addEventListener(CECommand.MessageToContent, this.receiveCustomEvent);
     }
 
-    public override receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void 
+    protected override receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void 
     {
         if(value === undefined) return;
         
@@ -37,5 +44,14 @@ export default class ContentEventControllerService extends DocumentEventControll
                 GlobalLogger.error(`Error while receive event from ${ContentMessageHandlerService.key}`, exception);
             }
         });
+    }
+
+    private receiveBackendEvent(value: { MessageId: string, Type: string; Data: any; }): void
+    {
+        if(value === undefined) return;
+
+        //TODO: Implement logic
+
+        this.port.postMessage(value);
     }
 }

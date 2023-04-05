@@ -73,7 +73,7 @@ export abstract class EventController<TData, TSender> extends Service implements
         throw new Error("Method not implemented.");
     }
 
-    public receive(value: TData, sender: TSender): void
+    protected receive(value: TData, sender: TSender): void
     {
         throw new Error("Method not implemented.");
     }

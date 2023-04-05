@@ -6,8 +6,6 @@ export default interface IDocumentEventControllerService extends IService
 
     send(value: {Type: string, Data: any}): void;
 
-    receive(value: {Type: string, Data: any}, sender: EventTarget | null): void;
-
     add(key: number, callback: ((event: {Type: string, Data: any}, sender: EventTarget | null) => void)): void;
 
     remove(key: number, callback: ((event: {Type: string, Data: any}, sender: EventTarget | null) => void)): void;

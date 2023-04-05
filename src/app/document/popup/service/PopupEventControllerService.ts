@@ -20,7 +20,7 @@ export default class PopupEventControllerService extends DocumentEventController
         window.addEventListener(CECommand.MessageToPopup, this.receiveCustomEvent);
     }
 
-    public override receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void 
+    protected override receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void 
     {
         GlobalLogger.log('receive on popup', value, sender);
     }

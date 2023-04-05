@@ -21,7 +21,7 @@ export default class MainEventControllerService extends DocumentEventControllerS
         window.addEventListener(CECommand.MessageToMain, this.receiveCustomEvent);
     }
 
-    public override receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void 
+    protected override receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void 
     {
         switch(value.Type)
         {
