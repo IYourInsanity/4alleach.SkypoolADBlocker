@@ -24,7 +24,7 @@ export default class ContentMessageHandlerService extends Service implements ICo
         if(this.isWork === true) return;
         this.isWork = true;
 
-        this.eventController = this.serviceHub?.get<IDocumentEventControllerService>(ContentEventControllerService)!;
+        this.eventController = this.serviceHub.get<IDocumentEventControllerService>(ContentEventControllerService);
         this.eventController.add(ContentMessageHandlerService.hash, this.receive);
     }
     

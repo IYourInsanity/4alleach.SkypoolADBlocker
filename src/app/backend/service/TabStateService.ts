@@ -1,5 +1,4 @@
 import Guid from "../../../common/model/Guid";
-import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import Service from "../../../framework/service/Service";
 import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
 import CECommand from "../../document/model/CECommand";
@@ -8,6 +7,9 @@ import { TabInfo, TabState } from "../model/Tab/TabInfo";
 import BackendEventControllerService from "./BackendEventControllerService";
 import MainScriptInstallService from "./MainScriptInstallService";
 import UrlService from "./UrlService";
+import IBackendEventControllerService from "./abstraction/IBackendEventControllerService";
+import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
+import IUrlService from "./abstraction/IUrlService";
 
 export default class TabStateService extends Service
 {
@@ -15,7 +17,9 @@ export default class TabStateService extends Service
 
     private readonly tabs: { [key: number]: TabInfo };
 
-    private eventController: BackendEventControllerService;
+    private eventService: IBackendEventControllerService;
+    private urlService: IUrlService;
+    private installService: IMainScriptInstallService;
 
     constructor(serviceHub: IServiceHub)
     {
@@ -38,9 +42,11 @@ export default class TabStateService extends Service
 
         this.isWork = true;
 
-        this.eventController = this.serviceHub?.get<BackendEventControllerService>(BackendEventControllerService)!;
+        this.eventService = this.serviceHub.get<IBackendEventControllerService>(BackendEventControllerService);
+        this.installService = this.serviceHub.get<IMainScriptInstallService>(MainScriptInstallService);
+        this.urlService = this.serviceHub.get<IUrlService>(UrlService);
         
-        chrome.tabs.onCreated.addListener(this.onCreated);
+        chrome.tabs.onCreated.addListener(this.onCreated); 
         chrome.tabs.onUpdated.addListener(this.onUpdated);
         chrome.tabs.onRemoved.addListener(this.onRemoved);
 
@@ -60,15 +66,11 @@ export default class TabStateService extends Service
 
                 frameInfo.MainScriptInstalled = true;
                 frameInfo.State = FrameState.Loaded;
-
-                GlobalLogger.log('CECommand.MainScriptInstalled', this.tabs, sender);
-
+                
                 break;
             case CECommand.MainScriptUninstalled:
 
                 delete this.tabs[tabId].Frames[frameId];
-
-                GlobalLogger.log('CECommand.MainScriptUninstalled', this.tabs, sender);
 
                 break;
         }
@@ -81,14 +83,14 @@ export default class TabStateService extends Service
         const tabId = tab.id!;
 
         this.tabs[tabId] = TabStateService.createTabInfo();
-        this.eventController.add(tabId, this.receive);
+        this.eventService.add(tabId, this.receive);
     }
 
     private onUpdated(tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab)
     {
         if(this.tabs[tabId] === undefined)
         {
-            this.eventController.add(tabId, this.receive);
+            this.eventService.add(tabId, this.receive);
             this.tabs[tabId] = TabStateService.createTabInfo();
         }
 
@@ -113,16 +115,15 @@ export default class TabStateService extends Service
         if(this.tabs[tabId] !== undefined)
         {
             delete this.tabs[tabId];
-            this.eventController.remove(tabId, this.receive);
+            this.eventService.remove(tabId, this.receive);
         }
     }
 
     private async onCommited(details: chrome.webNavigation.WebNavigationFramedCallbackDetails, filters?: chrome.webNavigation.WebNavigationFramedCallbackDetails | undefined): Promise<void>
     {
-        const urlService = this.serviceHub?.get<UrlService>(UrlService)!;
         const url = details.url;
 
-        if(urlService.validate(url) === false)
+        if(this.urlService.validate(url) === false)
         {
             return;
         }
@@ -137,9 +138,7 @@ export default class TabStateService extends Service
 
         this.tabs[tabId].Frames[frameId] = TabStateService.createFrameInfo();
 
-        const installerService = this.serviceHub?.get<MainScriptInstallService>(MainScriptInstallService)!;
-
-        if(await installerService.install(tabId, frameId) === false)
+        if(await this.installService.install(tabId, frameId) === false)
         {
             return;
         }

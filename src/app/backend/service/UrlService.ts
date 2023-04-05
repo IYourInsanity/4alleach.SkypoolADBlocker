@@ -1,7 +1,8 @@
 import Guid from "../../../common/model/Guid";
 import Service from "../../../framework/service/Service";
+import IUrlService from "./abstraction/IUrlService";
 
-export default class UrlService extends Service
+export default class UrlService extends Service implements IUrlService
 {
     public static key: string = Guid.new();
 

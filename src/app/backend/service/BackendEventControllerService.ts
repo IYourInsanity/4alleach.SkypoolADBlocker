@@ -2,8 +2,11 @@ import Guid from "../../../common/model/Guid";
 import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import { EventController } from "../../../framework/service/EventController";
 import CECommand from "../../document/model/CECommand";
+import IBackendEventControllerService from "./abstraction/IBackendEventControllerService";
 
-export default class BackendEventControllerService extends EventController<{Type: string, Data: any}, chrome.runtime.MessageSender>
+export default class BackendEventControllerService 
+extends EventController<{Type: string, Data: any}, chrome.runtime.MessageSender> 
+implements IBackendEventControllerService
 {
     public static key: string = Guid.new();
 

@@ -40,15 +40,16 @@ export default class ServiceHub implements IServiceHub
         }
     }
 
-    public get<TService extends IService>(option: Function): TService | null
+    public get<TService extends IService>(option: Function): TService
     {
+        let service: TService = <TService>{};
+
         if('key' in option === false)
         {
             GlobalLogger.error('Object is not a service', option);
-            return null;
+            return service;
         }
 
-        let service: TService | null = null;
         try
         {
             const key = (option as any).key;

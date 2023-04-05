@@ -5,14 +5,18 @@ export default abstract class Service implements IService
 {
     public readonly key: string;
 
-    protected readonly serviceHub?: IServiceHub;
+    protected readonly serviceHub: IServiceHub;
 
     protected isWork: boolean;
 
     constructor(key: string, serviceHub?: IServiceHub)
     {
         this.key = key;
-        this.serviceHub = serviceHub;
+
+        if(serviceHub !== undefined)
+        {
+            this.serviceHub = serviceHub;
+        }
 
         this.isWork = false;
 

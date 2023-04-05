@@ -3,6 +3,7 @@ import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
 import CEDocument from "../../global/CEDocument";
 import CECommand from "../../model/CECommand";
+import IDocumentEventControllerService from "../../service/abstraction/IDocumentEventControllerService";
 import MainEventControllerService from "./MainEventControllerService";
 import ICEDocumentControllerService from "./abstraction/ICEDocumentControllerService";
 
@@ -11,7 +12,7 @@ export default class CEDocumentControllerService extends Service implements ICED
     public static readonly key: string = Guid.new();
 
     private CEDocument: CEDocument;
-    private controller: MainEventControllerService;
+    private eventService: IDocumentEventControllerService;
 
     constructor(serviceHub: IServiceHub)
     {
@@ -33,17 +34,17 @@ export default class CEDocumentControllerService extends Service implements ICED
             uninstallFrame: this.uninstallFrame
         };
 
-        this.controller = this.serviceHub?.get<MainEventControllerService>(MainEventControllerService)!;
+        this.eventService = this.serviceHub.get<IDocumentEventControllerService>(MainEventControllerService);
     }
 
     private installFrame(frameId: number): void
     {
         this.CEDocument.FrameId = frameId;
-        this.controller.send({ Type: CECommand.MainScriptInstalled, Data: { } });
+        this.eventService.send({ Type: CECommand.MainScriptInstalled, Data: { } });
     }
 
     private uninstallFrame(): void
     {
-        this.controller.send({ Type: CECommand.MainScriptUninstalled, Data: { } });
+        this.eventService.send({ Type: CECommand.MainScriptUninstalled, Data: { } });
     }
 }

@@ -2,8 +2,9 @@ import Guid from "../../../common/model/Guid";
 import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import Service from "../../../framework/service/Service";
 import CEDocument from "../../document/global/CEDocument";
+import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
 
-export default class MainScriptInstallService extends Service
+export default class MainScriptInstallService extends Service implements IMainScriptInstallService
 {
     public static key: string = Guid.new();
     
