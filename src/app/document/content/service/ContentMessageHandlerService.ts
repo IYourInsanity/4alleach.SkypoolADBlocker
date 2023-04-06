@@ -1,10 +1,11 @@
 import Guid from "../../../../common/model/Guid";
+import IEventMessage from "../../../../framework/abstraction/IEventMessage";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
-import CECommandGenerator from "../../helper/CECommandGenerator";
-import CECommand from "../../model/CECommand";
+import CECommandGenerator from "../../helper/EventGenerator";
+import CECommand from "../../model/EventCommand";
 import ContentEventControllerService from "./ContentEventControllerService";
-import IDocumentEventControllerService from "../../service/abstraction/IDocumentEventControllerService";
+import IContentEventControllerService from "./abstraction/IContentEventControllerService";
 import IContentMessageHandlerService from "./abstraction/IContentMessageHandlerService";
 
 export default class ContentMessageHandlerService extends Service implements IContentMessageHandlerService
@@ -12,7 +13,7 @@ export default class ContentMessageHandlerService extends Service implements ICo
     public static readonly key: string = Guid.new();
     public static readonly hash: number = ContentMessageHandlerService.GetHashCode(ContentMessageHandlerService.key);
 
-    private eventController: IDocumentEventControllerService;
+    private eventController: IContentEventControllerService;
 
     constructor(serviceHub: IServiceHub)
     {
@@ -24,18 +25,18 @@ export default class ContentMessageHandlerService extends Service implements ICo
         if(this.isWork === true) return;
         this.isWork = true;
 
-        this.eventController = this.serviceHub.get<IDocumentEventControllerService>(ContentEventControllerService);
+        this.eventController = this.serviceHub.get<IContentEventControllerService>(ContentEventControllerService);
         this.eventController.add(ContentMessageHandlerService.hash, this.receive);
     }
     
-    private receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void
+    private receive(message: IEventMessage, sender: EventTarget | chrome.runtime.Port | null): void
     {
-        switch(value.Type)
+        switch(message.Event)
         {
             case CECommand.MainScriptInstalled:
             case CECommand.MainScriptUninstalled:
 
-                const command = CECommandGenerator.generate(CECommand.MessageToBackend, value.Type, value.Data);
+                const command = CECommandGenerator.generateCustomEvent(CECommand.MessageToBackend, message);
                 chrome.runtime.sendMessage(command);
                 
                 break;

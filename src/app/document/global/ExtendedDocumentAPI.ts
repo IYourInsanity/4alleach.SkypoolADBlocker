@@ -1,4 +1,4 @@
-export default interface CEDocumentAPI
+export default interface ExtendedDocumentAPI
 {
     installFrame: (frameId: number) => void;
     uninstallFrame: () => void;

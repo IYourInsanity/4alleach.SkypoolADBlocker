@@ -1,9 +1,6 @@
 import { EventController } from "../../../framework/service/EventController";
-import IDocumentEventControllerService from "./abstraction/IDocumentEventControllerService";
 
-export default abstract class DocumentEventControllerService
-extends EventController<{Type: string, Data: any}, EventTarget | null> 
-implements IDocumentEventControllerService
+export abstract class DocumentEventControllerService<TData, TSender> extends EventController<TData, TSender>
 {
     constructor(key: string)
     {
@@ -12,11 +9,11 @@ implements IDocumentEventControllerService
         this.receiveCustomEvent = this.receiveCustomEvent.bind(this);
     }
     
-    public receiveCustomEvent(event: CustomEvent | Event): void 
+    protected receiveCustomEvent(event: CustomEvent | Event): void 
     {
         if(event instanceof CustomEvent)
         {
-            this.receive({Type: event.detail.Type, Data: event.detail.Data}, event.target);
+            this.receive(event.detail.Message, <TSender>event.target);
         }
-    }
+    } 
 }

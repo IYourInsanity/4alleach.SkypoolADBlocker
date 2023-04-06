@@ -32,7 +32,7 @@ export default class BackendStartup extends Startup<IConfiguration>
 
         serviceHub.initialize();
 
-        /*
+        
         new Promise(async (resolve) => 
         {
             await new Promise(resolve1 => setTimeout(resolve1, 5000));
@@ -48,7 +48,7 @@ export default class BackendStartup extends Startup<IConfiguration>
             console.log('Receive response from content', response);
 
             resolve(true);
-        })*/
+        })
         
         //TODO Initialize Services, Managers and etc.
     }

@@ -1,10 +1,12 @@
 import Guid from "../../../../common/model/Guid";
+import IEventMessage from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
-import CECommandGenerator from "../../helper/CECommandGenerator";
-import CECommand from "../../model/CECommand";
-import DocumentEventControllerService from "../../service/DocumentEventControllerService";
+import EventGenerator from "../../helper/EventGenerator";
+import EventCommand from "../../model/EventCommand";
+import { DocumentEventControllerService } from "../../service/DocumentEventControllerService"
+import IMainEventControllerService from "./abstraction/IMainEventControllerService";
 
-export default class MainEventControllerService extends DocumentEventControllerService
+export default class MainEventControllerService extends DocumentEventControllerService<IEventMessage, EventTarget | null> implements IMainEventControllerService
 {
     public static key: string = Guid.new();
 
@@ -18,24 +20,24 @@ export default class MainEventControllerService extends DocumentEventControllerS
         if(this.isWork === true) return;
         this.isWork = true;
 
-        window.addEventListener(CECommand.MessageToMain, this.receiveCustomEvent);
+        window.addEventListener(EventCommand.MessageToMain, this.receiveCustomEvent);
     }
 
-    protected override receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void 
+    protected override receive(message: IEventMessage, sender: EventTarget | null): void 
     {
-        switch(value.Type)
+        switch(message.Event)
         {
-            case CECommand.Ping:
+            case EventCommand.Ping:
 
-                GlobalLogger.log('receive on main', value, sender);
+                GlobalLogger.log('receive on main', message.Data, sender);
 
                 break;
         }
     }
 
-    public override send(value: { Type: string; Data: any; }): void
+    public override send(message: IEventMessage): void
     {
-        const command = CECommandGenerator.generateCustomEvent(CECommand.MessageToContent, value.Type, value.Data);
+        const command = EventGenerator.generateCustomEvent(EventCommand.MessageToContent, message);
         window.dispatchEvent(command);
     }
 }

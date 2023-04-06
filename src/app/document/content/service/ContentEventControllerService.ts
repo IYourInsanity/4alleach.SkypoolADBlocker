@@ -1,10 +1,12 @@
 import Guid from "../../../../common/model/Guid";
+import IEventMessage from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
-import CECommand from "../../model/CECommand";
-import DocumentEventControllerService from "../../service/DocumentEventControllerService";
+import CECommand from "../../model/EventCommand";
 import ContentMessageHandlerService from "./ContentMessageHandlerService";
+import { DocumentEventControllerService } from "../../service/DocumentEventControllerService"
+import IContentEventControllerService from "./abstraction/IContentEventControllerService";
 
-export default class ContentEventControllerService extends DocumentEventControllerService
+export default class ContentEventControllerService extends DocumentEventControllerService<IEventMessage, EventTarget | chrome.runtime.Port | null> implements IContentEventControllerService
 {
     public static key: string = Guid.new();
 
@@ -15,6 +17,7 @@ export default class ContentEventControllerService extends DocumentEventControll
         super(ContentEventControllerService.key);
 
         this.receiveBackendEvent = this.receiveBackendEvent.bind(this);
+        this.receiveCustomEvent = this.receiveCustomEvent.bind(this);
     }
 
     public override initialize(): void 
@@ -23,21 +26,21 @@ export default class ContentEventControllerService extends DocumentEventControll
 
         this.isWork = true;
 
-        this.port = chrome.runtime.connect({ name: Guid.new() });
+        this.port = chrome.runtime.connect({ name: ContentEventControllerService.key });
         this.port.onMessage.addListener(this.receiveBackendEvent);
 
         window.addEventListener(CECommand.MessageToContent, this.receiveCustomEvent);
     }
 
-    protected override receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void 
+    protected override receive(message: IEventMessage, sender: EventTarget | chrome.runtime.Port | null): void 
     {
-        if(value === undefined) return;
+        if(message === undefined) return;
         
         this.listeners[ContentMessageHandlerService.hash]?.forEach(listener => 
         {
             try
             {
-                listener(value, sender);
+                listener(message, sender);
             }
             catch (exception)
             {
@@ -46,12 +49,10 @@ export default class ContentEventControllerService extends DocumentEventControll
         });
     }
 
-    private receiveBackendEvent(value: { MessageId: string, Type: string; Data: any; }): void
+    private receiveBackendEvent(message: IEventMessage, port: chrome.runtime.Port): void
     {
-        if(value === undefined) return;
+        if(message === undefined) return;
 
-        //TODO: Implement logic
-
-        this.port.postMessage(value);
+        this.receive(message, port);
     }
 }

@@ -1,7 +1,7 @@
 import Guid from "../../../common/model/Guid";
 import Service from "../../../framework/service/Service";
 import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
-import CECommand from "../../document/model/CECommand";
+import CECommand from "../../document/model/EventCommand";
 import { FrameInfo, FrameState } from "../model/tab/FrameInfo";
 import { TabInfo, TabState } from "../model/tab/TabInfo";
 import BackendEventControllerService from "./BackendEventControllerService";

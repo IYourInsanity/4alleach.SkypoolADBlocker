@@ -1,13 +1,11 @@
 import Guid from "../../../common/model/Guid";
+import IEventMessage from "../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import { EventController } from "../../../framework/service/EventController";
-import CECommand from "../../document/model/CECommand";
 import { PortInfo } from "../model/connection/portInfo";
 import IBackendEventControllerService from "./abstraction/IBackendEventControllerService";
 
-export default class BackendEventControllerService 
-extends EventController<{Type: string, Data: any}, chrome.runtime.MessageSender> 
-implements IBackendEventControllerService
+export default class BackendEventControllerService extends EventController<IEventMessage, chrome.runtime.MessageSender> implements IBackendEventControllerService
 {
     public static key: string = Guid.new();
     
@@ -42,12 +40,11 @@ implements IBackendEventControllerService
         chrome.tabs.onRemoved.addListener(this.onRemoved);
     }
     
-    protected override receive(value: { Type: string; Data: any; }, sender: chrome.runtime.MessageSender): void 
+    protected override receive(message: IEventMessage, sender: chrome.runtime.MessageSender): void 
     {
-        if(value === undefined || value.Type === CECommand.MessageToBackend) return;
+        if(message === undefined) return;
 
         const key = sender.tab!.id!;
-        const message = value.Data;
 
         GlobalLogger.debug('Receive', message);
 
