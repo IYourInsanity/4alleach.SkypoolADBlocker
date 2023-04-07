@@ -1,6 +1,8 @@
+import IEventMessage from "../../../../framework/abstraction/IEventMessage";
+
 export interface ResponseInfo
 {
-    readonly resolve: (value: { Type: string; Data: any; }) => void;
+    readonly resolve: (value: IEventMessage) => void;
 
     readonly timeoutId: any;
 }

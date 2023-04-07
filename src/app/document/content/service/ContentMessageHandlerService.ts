@@ -2,8 +2,7 @@ import Guid from "../../../../common/model/Guid";
 import IEventMessage from "../../../../framework/abstraction/IEventMessage";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
-import CECommandGenerator from "../../helper/EventGenerator";
-import CECommand from "../../model/EventCommand";
+import EventCommand from "../../../../common/model/EventCommand";
 import ContentEventControllerService from "./ContentEventControllerService";
 import IContentEventControllerService from "./abstraction/IContentEventControllerService";
 import IContentMessageHandlerService from "./abstraction/IContentMessageHandlerService";
@@ -33,11 +32,10 @@ export default class ContentMessageHandlerService extends Service implements ICo
     {
         switch(message.Event)
         {
-            case CECommand.MainScriptInstalled:
-            case CECommand.MainScriptUninstalled:
+            case EventCommand.MainScriptInstalled:
+            case EventCommand.MainScriptUninstalled:
 
-                const command = CECommandGenerator.generateCustomEvent(CECommand.MessageToBackend, message);
-                chrome.runtime.sendMessage(command);
+                chrome.runtime.sendMessage(message);
                 
                 break;
         }

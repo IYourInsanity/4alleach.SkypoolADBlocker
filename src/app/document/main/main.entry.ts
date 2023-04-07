@@ -1,7 +1,7 @@
 import Guid from "../../../common/model/Guid";
 import Startup from "../../../framework/entry/Startup";
 import { IConfiguration } from "../../../framework/entry/abstraction/IConfiguration";
-import CEDocumentControllerService from "./service/CEDocumentControllerService";
+import ExtendedDocumentControllerService from "./service/ExtendedDocumentControllerService";
 import MainEventControllerService from "./service/MainEventControllerService";
 import WindowEventControllerService from "./service/WindowEventControllerService";
 
@@ -23,7 +23,7 @@ export default class MainStartup extends Startup<IConfiguration>
         const serviceHub = this.serviceHub;
 
         serviceHub.register(WindowEventControllerService);
-        serviceHub.register(CEDocumentControllerService);
+        serviceHub.register(ExtendedDocumentControllerService);
         serviceHub.register(MainEventControllerService);
         
         serviceHub.initialize();

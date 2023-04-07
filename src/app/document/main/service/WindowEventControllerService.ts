@@ -1,14 +1,14 @@
 import Guid from "../../../../common/model/Guid";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
-import CEDocument from "../../global/CEDocument";
 import IWindowEventControllerService from "./abstraction/IWindowEventControllerService";
+import ExtendedDocument from "../../global/ExtendedDocument";
 
 export default class WindowEventControllerService extends Service implements IWindowEventControllerService
 {
     public static readonly key: string = Guid.new();
 
-    private CEDocument: CEDocument;
+    private extendedDocument: ExtendedDocument;
 
     constructor(serviceHub: IServiceHub)
     {
@@ -22,13 +22,13 @@ export default class WindowEventControllerService extends Service implements IWi
         if(this.isWork === true) return;
         this.isWork = true;
 
-        this.CEDocument = document as CEDocument;
+        this.extendedDocument = document as ExtendedDocument;
 
         //window.addEventListener('beforunload', this.befounload, true);
     }
 
     private befounload(event: Event): void
     {
-        this.CEDocument.API.uninstallFrame();
+        this.extendedDocument.API.uninstallFrame();
     }
 }

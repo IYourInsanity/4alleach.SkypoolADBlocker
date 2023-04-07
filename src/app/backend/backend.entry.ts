@@ -7,6 +7,7 @@ import UrlService from "./service/UrlService";
 import MainScriptInstallService from "./service/MainScriptInstallService";
 import IBackendEventControllerService from "./service/abstraction/IBackendEventControllerService";
 import ITabStateService from "./service/abstraction/ITabStateService";
+import IEventMessage from "../../framework/abstraction/IEventMessage";
 
 const config: IConfiguration = 
 {
@@ -40,7 +41,7 @@ export default class BackendStartup extends Startup<IConfiguration>
             const state = serviceHub.get<ITabStateService>(TabStateService);
             const service = serviceHub.get<IBackendEventControllerService>(BackendEventControllerService);
 
-            const data = {Type:'test', Data: 'Hello World'};
+            const data: IEventMessage = { MessageId:Guid.new(), Event:'test', Data: 'Hello World'};
             console.log('Send message to content and wait response', data);
 
             const response = await service.sendAsync(state.getActiveTabId(), 0, data);

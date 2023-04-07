@@ -1,7 +1,7 @@
 import Guid from "../../../../common/model/Guid";
 import IEventMessage from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
-import CECommand from "../../model/EventCommand";
+import EventCommand from "../../../../common/model/EventCommand";
 import ContentMessageHandlerService from "./ContentMessageHandlerService";
 import { DocumentEventControllerService } from "../../service/DocumentEventControllerService"
 import IContentEventControllerService from "./abstraction/IContentEventControllerService";
@@ -29,7 +29,7 @@ export default class ContentEventControllerService extends DocumentEventControll
         this.port = chrome.runtime.connect({ name: ContentEventControllerService.key });
         this.port.onMessage.addListener(this.receiveBackendEvent);
 
-        window.addEventListener(CECommand.MessageToContent, this.receiveCustomEvent);
+        window.addEventListener(EventCommand.MessageToContent, this.receiveCustomEvent);
     }
 
     protected override receive(message: IEventMessage, sender: EventTarget | chrome.runtime.Port | null): void 

@@ -1,7 +1,7 @@
 import Guid from "../../../common/model/Guid";
 import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import Service from "../../../framework/service/Service";
-import CEDocument from "../../document/global/CEDocument";
+import ExtendedDocument from "../../document/global/ExtendedDocument";
 import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
 
 export default class MainScriptInstallService extends Service implements IMainScriptInstallService
@@ -100,7 +100,7 @@ export default class MainScriptInstallService extends Service implements IMainSc
     {
         const document_installFrame = function(frameId: number): void
         {
-            (document as CEDocument).API.installFrame(frameId);
+            (document as ExtendedDocument).API.installFrame(frameId);
         }
 
         chrome.scripting.executeScript({

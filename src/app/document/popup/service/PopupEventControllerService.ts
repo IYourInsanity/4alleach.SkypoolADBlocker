@@ -1,9 +1,10 @@
 import Guid from "../../../../common/model/Guid";
+import IEventMessage from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
-import CECommand from "../../model/CECommand";
-import DocumentEventControllerService from "../../service/DocumentEventControllerService";
+import EventCommand from "../../../../common/model/EventCommand";
+import { DocumentEventControllerService } from "../../service/DocumentEventControllerService";
 
-export default class PopupEventControllerService extends DocumentEventControllerService
+export default class PopupEventControllerService extends DocumentEventControllerService<IEventMessage, chrome.runtime.Port>
 {
     public static key: string = Guid.new();
 
@@ -17,11 +18,11 @@ export default class PopupEventControllerService extends DocumentEventController
         if(this.isWork === true) return;
         this.isWork = true;
         
-        window.addEventListener(CECommand.MessageToPopup, this.receiveCustomEvent);
+        window.addEventListener(EventCommand.MessageToPopup, this.receiveCustomEvent);
     }
 
-    protected override receive(value: { Type: string; Data: any; }, sender: EventTarget | null): void 
+    protected override receive(message: IEventMessage, sender: chrome.runtime.Port): void 
     {
-        GlobalLogger.log('receive on popup', value, sender);
+        GlobalLogger.log('receive on popup', message, sender);
     }
 }

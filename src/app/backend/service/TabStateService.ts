@@ -1,7 +1,7 @@
 import Guid from "../../../common/model/Guid";
 import Service from "../../../framework/service/Service";
 import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
-import CECommand from "../../document/model/EventCommand";
+import EventCommand from "../../../common/model/EventCommand";
 import { FrameInfo, FrameState } from "../model/tab/FrameInfo";
 import { TabInfo, TabState } from "../model/tab/TabInfo";
 import BackendEventControllerService from "./BackendEventControllerService";
@@ -11,6 +11,7 @@ import IBackendEventControllerService from "./abstraction/IBackendEventControlle
 import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
 import ITabStateService from "./abstraction/ITabStateService";
 import IUrlService from "./abstraction/IUrlService";
+import IEventMessage from "../../../framework/abstraction/IEventMessage";
 
 export default class TabStateService extends Service implements ITabStateService
 {
@@ -65,14 +66,14 @@ export default class TabStateService extends Service implements ITabStateService
         return this.activeTabId;
     }
 
-    private receive(event: { Type: string, Data: any }, sender: chrome.runtime.MessageSender): void
+    private receive(message: IEventMessage, sender: chrome.runtime.MessageSender): void
     {
         const tabId = sender.tab!.id!;
         const frameId = sender.frameId!;
 
-        switch(event.Type)
+        switch(message.Event)
         {
-            case CECommand.MainScriptInstalled:
+            case EventCommand.MainScriptInstalled:
 
                 const frameInfo = this.tabs[tabId].Frames[frameId];
 
@@ -80,7 +81,7 @@ export default class TabStateService extends Service implements ITabStateService
                 frameInfo.State = FrameState.Loaded;
                 
                 break;
-            case CECommand.MainScriptUninstalled:
+            case EventCommand.MainScriptUninstalled:
 
                 delete this.tabs[tabId].Frames[frameId];
 

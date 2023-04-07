@@ -1,8 +1,8 @@
 import Guid from "../../../../common/model/Guid";
 import IEventMessage from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
-import EventGenerator from "../../helper/EventGenerator";
-import EventCommand from "../../model/EventCommand";
+import EventGenerator from "../../../../common/helper/EventGenerator";
+import EventCommand from "../../../../common/model/EventCommand";
 import { DocumentEventControllerService } from "../../service/DocumentEventControllerService"
 import IMainEventControllerService from "./abstraction/IMainEventControllerService";
 

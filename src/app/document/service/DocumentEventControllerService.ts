@@ -1,6 +1,7 @@
+import IEventMessage from "../../../framework/abstraction/IEventMessage";
 import { EventController } from "../../../framework/service/EventController";
 
-export abstract class DocumentEventControllerService<TData, TSender> extends EventController<TData, TSender>
+export abstract class DocumentEventControllerService<TData extends IEventMessage, TSender> extends EventController<TData, TSender>
 {
     constructor(key: string)
     {

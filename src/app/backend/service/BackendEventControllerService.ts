@@ -61,31 +61,29 @@ export default class BackendEventControllerService extends EventController<IEven
         });
     }
 
-    public sendOneWay(tabId: number, frameId: number, value: { Type: string; Data: any; }): void
+    public sendOneWay(tabId: number, frameId: number, message: IEventMessage): void
     {
-        this.portHub[tabId][frameId].port.postMessage({ MessageId: Guid.empty, Type: value.Type, Data: value.Data });
+        this.portHub[tabId][frameId].port.postMessage(message);
     }
 
-    public sendAsync(tabId: number, frameId: number, value: { Type: string; Data: any; }): Promise<{ Type: string; Data: any; }>
+    public sendAsync(tabId: number, frameId: number, message: IEventMessage): Promise<IEventMessage>
     {
         const $this = this;
         return new Promise(resolve => 
             {
-                let empty = <{ Type: string; Data: any; }>{};
-
-                const id: string = Guid.new();
+                let empty = <IEventMessage>{};
 
                 const timeoutId = setTimeout(() => 
                 {
-                    delete $this.portHub[tabId][frameId].response[id];
+                    delete $this.portHub[tabId][frameId].response[message.MessageId];
                     resolve(empty);
 
-                    GlobalLogger.error('No response from content side', tabId, frameId, value);
+                    GlobalLogger.error('No response from content side', tabId, frameId, message);
 
                 }, $this.responseTimeout);
 
-                $this.portHub[tabId][frameId].response[id] = { resolve: resolve, timeoutId: timeoutId };
-                $this.portHub[tabId][frameId].port.postMessage({ MessageId: id, Type: value.Type, Data: value.Data });
+                $this.portHub[tabId][frameId].response[message.MessageId] = { resolve: resolve, timeoutId: timeoutId };
+                $this.portHub[tabId][frameId].port.postMessage(message);
             });
     }
 
@@ -134,7 +132,7 @@ export default class BackendEventControllerService extends EventController<IEven
         for (let index = 0; index < length; index++) 
         {
             clearTimeout(responses[index].timeoutId);
-            responses[index].resolve(<{ Type: string; Data: any; }>{});
+            responses[index].resolve(<IEventMessage>{});
         }
 
         port.onMessage.removeListener(this.onMessage);
@@ -143,7 +141,7 @@ export default class BackendEventControllerService extends EventController<IEven
         delete collection[frameId];
     }
 
-    private onMessage(value: { MessageId: string; Type: string; Data: any; }, port: chrome.runtime.Port): void
+    private onMessage(message: IEventMessage, port: chrome.runtime.Port): void
     {
         const sender = port.sender!;
         const tabId = sender.tab!.id!;
@@ -163,7 +161,7 @@ export default class BackendEventControllerService extends EventController<IEven
             return;
         }
 
-        const responseInfo = portInfo.response[value.MessageId];
+        const responseInfo = portInfo.response[message.MessageId];
 
         if(responseInfo === undefined)
         {
@@ -171,9 +169,9 @@ export default class BackendEventControllerService extends EventController<IEven
         }
 
         clearTimeout(responseInfo.timeoutId);
-        responseInfo.resolve({Type: value.Type, Data: value.Data});
+        responseInfo.resolve(message);
 
-        delete portInfo.response[value.MessageId];
+        delete portInfo.response[message.MessageId];
     }
 
     private onRemoved(tabId: number, info: chrome.tabs.TabRemoveInfo): void
