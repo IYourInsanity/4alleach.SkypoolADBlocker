@@ -1,4 +1,4 @@
-import IEventMessage from "../../../../framework/abstraction/IEventMessage";
+import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 
 export interface ResponseInfo
 {

@@ -1,5 +1,5 @@
 import Guid from "../../../../common/model/Guid";
-import IEventMessage from "../../../../framework/abstraction/IEventMessage";
+import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import EventGenerator from "../../../../common/helper/EventGenerator";
 import EventCommand from "../../../../common/model/EventCommand";

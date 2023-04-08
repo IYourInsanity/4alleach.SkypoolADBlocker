@@ -1,4 +1,4 @@
-import IEventMessage from "../abstraction/IEventMessage";
+import { IEventMessage } from "../abstraction/IEventMessage";
 import GlobalLogger from "../logger/GlobalLogger";
 import Service from "./Service";
 import IEventController from "./abstraction/IEventController";

@@ -1,5 +1,5 @@
 import Guid from "../model/Guid";
-import IEventMessage from "../../framework/abstraction/IEventMessage";
+import { IEventMessage } from "../../framework/abstraction/IEventMessage";
 
 export default class EventGenerator
 {

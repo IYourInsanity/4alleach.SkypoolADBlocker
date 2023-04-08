@@ -11,7 +11,7 @@ import IBackendEventControllerService from "./abstraction/IBackendEventControlle
 import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
 import ITabStateService from "./abstraction/ITabStateService";
 import IUrlService from "./abstraction/IUrlService";
-import IEventMessage from "../../../framework/abstraction/IEventMessage";
+import { IEventMessage } from "../../../framework/abstraction/IEventMessage";
 
 export default class TabStateService extends Service implements ITabStateService
 {

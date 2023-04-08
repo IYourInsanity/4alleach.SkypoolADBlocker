@@ -1,5 +1,5 @@
 import Guid from "../../../../common/model/Guid";
-import IEventMessage from "../../../../framework/abstraction/IEventMessage";
+import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import EventCommand from "../../../../common/model/EventCommand";
 import ContentMessageHandlerService from "./ContentMessageHandlerService";
@@ -52,6 +52,8 @@ export default class ContentEventControllerService extends DocumentEventControll
     private receiveBackendEvent(message: IEventMessage, port: chrome.runtime.Port): void
     {
         if(message === undefined) return;
+
+        console.log('receiveBackendEvent', message);
 
         this.receive(message, port);
     }

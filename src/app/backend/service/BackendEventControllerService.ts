@@ -1,5 +1,6 @@
 import Guid from "../../../common/model/Guid";
-import IEventMessage from "../../../framework/abstraction/IEventMessage";
+import { ICancellationToken } from "../../../framework/abstraction/ICancellationToken";
+import { IEventMessage, EventMessage } from "../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import { EventController } from "../../../framework/service/EventController";
 import { PortInfo } from "../model/connection/portInfo";
@@ -22,6 +23,7 @@ export default class BackendEventControllerService extends EventController<IEven
 
         this.sendOneWay = this.sendOneWay.bind(this);
         this.sendAsync = this.sendAsync.bind(this);
+        this.waitPortInitialization = this.waitPortInitialization.bind(this);
         
         this.onConnect = this.onConnect.bind(this);
         this.onMessage = this.onMessage.bind(this);
@@ -66,17 +68,23 @@ export default class BackendEventControllerService extends EventController<IEven
         this.portHub[tabId][frameId].port.postMessage(message);
     }
 
-    public sendAsync(tabId: number, frameId: number, message: IEventMessage): Promise<IEventMessage>
+    public sendAsync(tabId: number, frameId: number, message: IEventMessage, token: ICancellationToken): Promise<IEventMessage>
     {
         const $this = this;
-        return new Promise(resolve => 
+
+        return new Promise(async resolve => 
             {
-                let empty = <IEventMessage>{};
+                const result = await $this.waitPortInitialization(tabId, frameId, token);
+
+                if(result === false)
+                {
+                    resolve(EventMessage.CancelByToken(message.MessageId));
+                }
 
                 const timeoutId = setTimeout(() => 
                 {
                     delete $this.portHub[tabId][frameId].response[message.MessageId];
-                    resolve(empty);
+                    resolve(EventMessage.Cancel(message.MessageId));
 
                     GlobalLogger.error('No response from content side', tabId, frameId, message);
 
@@ -126,13 +134,19 @@ export default class BackendEventControllerService extends EventController<IEven
             return;
         }
 
-        const responses = Object.values(portInfo.response);
-        const length = responses.length;
+        const keys = Object.keys(portInfo.response);
+        const length = keys.length;
 
         for (let index = 0; index < length; index++) 
         {
-            clearTimeout(responses[index].timeoutId);
-            responses[index].resolve(<IEventMessage>{});
+            const key = keys[index];
+            const responseInfo = portInfo.response[key];
+            const timeoutId = responseInfo.timeoutId;
+            const response = responseInfo.resolve;
+
+            clearTimeout(timeoutId);
+
+            response(EventMessage.Disconnected(keys[index], { TabId: tabId, FrameId: frameId ?? 0 }));
         }
 
         port.onMessage.removeListener(this.onMessage);
@@ -177,5 +191,37 @@ export default class BackendEventControllerService extends EventController<IEven
     private onRemoved(tabId: number, info: chrome.tabs.TabRemoveInfo): void
     {
         delete this.portHub[tabId];
+    }
+    
+    private waitPortInitialization(tabId: number, frameId: number, token: ICancellationToken): Promise<boolean>
+    {
+        const $this = this;
+        return new Promise(async resolve => 
+        {
+            let isInitialized = false;
+
+            while(isInitialized === false && token.IsCanceled === false)
+            {
+                await new Promise(resolveWait => { setTimeout(resolveWait, 100) });
+
+                const portInfo =  $this.portHub[tabId];
+
+                if(portInfo === undefined)
+                {
+                    continue;
+                }
+
+                const frameInfo = portInfo[frameId];
+
+                if(frameInfo === undefined)
+                {
+                    continue;
+                }
+
+                isInitialized = true;
+            }
+
+            resolve(isInitialized);
+        });
     }
 }

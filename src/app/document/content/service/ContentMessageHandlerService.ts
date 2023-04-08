@@ -1,5 +1,5 @@
 import Guid from "../../../../common/model/Guid";
-import IEventMessage from "../../../../framework/abstraction/IEventMessage";
+import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
 import EventCommand from "../../../../common/model/EventCommand";
@@ -35,8 +35,18 @@ export default class ContentMessageHandlerService extends Service implements ICo
             case EventCommand.MainScriptInstalled:
             case EventCommand.MainScriptUninstalled:
 
+                console.log('MainScriptInstalled', message);
+
                 chrome.runtime.sendMessage(message);
                 
+                break;
+
+            case 'test':
+
+                console.log('ContentMessageHandlerService', message);
+
+                (<chrome.runtime.Port>sender).postMessage(message);
+
                 break;
         }
     }

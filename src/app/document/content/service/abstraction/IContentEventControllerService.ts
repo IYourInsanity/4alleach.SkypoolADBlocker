@@ -1,4 +1,4 @@
-import IEventMessage from "../../../../../framework/abstraction/IEventMessage";
+import { IEventMessage } from "../../../../../framework/abstraction/IEventMessage";
 import IService from "../../../../../framework/service/abstraction/IService";
 
 export default interface IContentEventControllerService extends IService

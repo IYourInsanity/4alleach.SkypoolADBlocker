@@ -1,4 +1,4 @@
-import IEventMessage from "../../abstraction/IEventMessage";
+import { IEventMessage } from "../../abstraction/IEventMessage";
 
 export default interface IEventController<TData extends IEventMessage, TSender>
 {

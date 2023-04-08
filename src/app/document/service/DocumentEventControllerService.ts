@@ -1,4 +1,4 @@
-import IEventMessage from "../../../framework/abstraction/IEventMessage";
+import { IEventMessage } from "../../../framework/abstraction/IEventMessage";
 import { EventController } from "../../../framework/service/EventController";
 
 export abstract class DocumentEventControllerService<TData extends IEventMessage, TSender> extends EventController<TData, TSender>
@@ -12,6 +12,8 @@ export abstract class DocumentEventControllerService<TData extends IEventMessage
     
     protected receiveCustomEvent(event: CustomEvent | Event): void 
     {
+        console.log('receiveCustomEvent', event);
+
         if(event instanceof CustomEvent)
         {
             this.receive(event.detail.Message, <TSender>event.target);
