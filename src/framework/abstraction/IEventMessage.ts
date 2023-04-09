@@ -1,10 +1,11 @@
+import { EventCommandType } from "../../common/model/EventCommandType";
 import Guid from "../../common/model/Guid";
 
 export interface IEventMessage
 {
    readonly MessageId: string;
 
-   readonly Event: string;
+   readonly Event: EventCommandType;
 
    readonly Data: any;
 }
@@ -13,31 +14,22 @@ export class EventMessage implements IEventMessage
 {
    readonly MessageId: string;
 
-   readonly Event: string;
+   readonly Event: EventCommandType;
 
    readonly Data: any;
    
-   constructor(messageId: string, event: string, data: any)
+   private constructor(messageId: string, event: EventCommandType, data: any)
    {
       this.MessageId = messageId;
       this.Event = event;
       this.Data = data;
    }
 
-   public static Empty: IEventMessage = new EventMessage(Guid.empty, 'Empty', {});
+   public static Empty: IEventMessage = new EventMessage(Guid.empty, EventCommandType.Empty, {});
 
-   public static Disconnected(messageId: string, data: any): IEventMessage
+   public static create(messageId: string, event: EventCommandType, data: any): IEventMessage
    {
-      return new EventMessage(messageId, 'Disconnected', data);
+      return new EventMessage(messageId, event, data);
    }
 
-   public static Cancel(messageId: string): IEventMessage
-   {
-      return new EventMessage(messageId, 'Cancel', {});
-   }
-
-   public static CancelByToken(messageId: string): IEventMessage
-   {
-      return new EventMessage(messageId, 'CancelByToken', {});
-   }
 }

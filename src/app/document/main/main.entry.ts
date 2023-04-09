@@ -3,6 +3,10 @@ import Startup from "../../../framework/entry/Startup";
 import { IConfiguration } from "../../../framework/entry/abstraction/IConfiguration";
 import ExtendedDocumentControllerService from "./service/ExtendedDocumentControllerService";
 import MainEventControllerService from "./service/MainEventControllerService";
+import MutationObserverService from "./service/MutationObserverService";
+import NodeADBlockerService from "./service/NodeADBlockerService";
+import NodeADAnalyzerService from "./service/NodeADAnalyzerService";
+import NodeStorageService from "./service/NodeStorageService";
 import WindowEventControllerService from "./service/WindowEventControllerService";
 
 const config: IConfiguration = 
@@ -25,6 +29,10 @@ export default class MainStartup extends Startup<IConfiguration>
         serviceHub.register(WindowEventControllerService);
         serviceHub.register(ExtendedDocumentControllerService);
         serviceHub.register(MainEventControllerService);
+        serviceHub.register(MutationObserverService);
+        serviceHub.register(NodeStorageService);
+        serviceHub.register(NodeADAnalyzerService);
+        serviceHub.register(NodeADBlockerService);
         
         serviceHub.initialize();
         

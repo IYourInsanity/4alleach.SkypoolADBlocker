@@ -3,10 +3,11 @@ import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
 import ExtendedDocument from "../../global/ExtendedDocument";
 import EventGenerator from "../../../../common/helper/EventGenerator";
-import EventCommand from "../../../../common/model/EventCommand";
+import { EventCommandType } from "../../../../common/model/EventCommandType";
 import MainEventControllerService from "./MainEventControllerService";
 import IExtendedDocumentControllerService from "./abstraction/IExtendedDocumentControllerService";
 import IMainEventControllerService from "./abstraction/IMainEventControllerService";
+import WaitHelper from "../../../../common/helper/WaitHelper";
 
 export default class ExtendedDocumentControllerService extends Service implements IExtendedDocumentControllerService
 {
@@ -21,6 +22,8 @@ export default class ExtendedDocumentControllerService extends Service implement
 
         this.installFrame = this.installFrame.bind(this);
         this.uninstallFrame = this.uninstallFrame.bind(this);
+
+        this.getFrameIdAsync = this.getFrameIdAsync.bind(this);
     }
 
     public initialize(): void 
@@ -32,7 +35,8 @@ export default class ExtendedDocumentControllerService extends Service implement
         this.extendedDocument.API = 
         {
             installFrame: this.installFrame,
-            uninstallFrame: this.uninstallFrame
+            uninstallFrame: this.uninstallFrame,
+            getFrameIdAsync: this.getFrameIdAsync
         };
 
         this.eventService = this.serviceHub.get<IMainEventControllerService>(MainEventControllerService);
@@ -41,14 +45,36 @@ export default class ExtendedDocumentControllerService extends Service implement
     private installFrame(frameId: number): void
     {
         this.extendedDocument.FrameId = frameId;
-        const message = EventGenerator.generateEventMessage(EventCommand.MainScriptInstalled, { });
+        const message = EventGenerator.generateEventMessage(EventCommandType.MainScriptInstalled, { });
         this.eventService.send(message);
     }
 
     private uninstallFrame(): void
     {
-        const message = EventGenerator.generateEventMessage(EventCommand.MainScriptUninstalled, { });
+        const message = EventGenerator.generateEventMessage(EventCommandType.MainScriptUninstalled, { });
         this.eventService.send(message);
+    }
+
+    private async getFrameIdAsync(): Promise<number>
+    {
+        const $this = this;
+        return new Promise(async resolve => 
+        {
+            const frameId = $this.extendedDocument.FrameId;
+
+            if(frameId !== undefined)
+            {
+                resolve(frameId);
+                return;
+            }
+
+            while($this.extendedDocument.FrameId === undefined)
+            { 
+                await WaitHelper.wait(100);
+            }
+
+            resolve($this.extendedDocument.FrameId);
+        });
     }
     
 }

@@ -1,9 +1,10 @@
 import Guid from "../model/Guid";
 import { IEventMessage } from "../../framework/abstraction/IEventMessage";
+import { EventCommandType } from "../model/EventCommandType";
 
 export default class EventGenerator
 {
-    public static generateCustomEvent(direct: string, message: IEventMessage): CustomEvent
+    public static generateCustomEvent(direct: EventCommandType, message: IEventMessage): CustomEvent
     {
         return new CustomEvent(direct, 
             { 
@@ -14,7 +15,7 @@ export default class EventGenerator
             });
     }
 
-    public static generateEventMessage(event: string, value: any): IEventMessage
+    public static generateEventMessage(event: EventCommandType, value: any): IEventMessage
     {
         return {
             MessageId: Guid.new(),

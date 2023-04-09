@@ -1,3 +1,4 @@
+import { EventCommandType } from "../../../common/model/EventCommandType";
 import Guid from "../../../common/model/Guid";
 import { ICancellationToken } from "../../../framework/abstraction/ICancellationToken";
 import { IEventMessage, EventMessage } from "../../../framework/abstraction/IEventMessage";
@@ -78,15 +79,16 @@ export default class BackendEventControllerService extends EventController<IEven
 
                 if(result === false)
                 {
-                    resolve(EventMessage.CancelByToken(message.MessageId));
+                    const cancelMessage = EventMessage.create(message.MessageId, EventCommandType.CancelByToken, { TabId: tabId, FrameId: frameId ?? 0 });
+                    resolve(cancelMessage);
                 }
 
                 const timeoutId = setTimeout(() => 
                 {
                     delete $this.portHub[tabId][frameId].response[message.MessageId];
-                    resolve(EventMessage.Cancel(message.MessageId));
 
-                    GlobalLogger.error('No response from content side', tabId, frameId, message);
+                    const cancelMessage = EventMessage.create(message.MessageId, EventCommandType.CancelByTimeout, { TabId: tabId, FrameId: frameId ?? 0 });
+                    resolve(cancelMessage);
 
                 }, $this.responseTimeout);
 
@@ -146,7 +148,9 @@ export default class BackendEventControllerService extends EventController<IEven
 
             clearTimeout(timeoutId);
 
-            response(EventMessage.Disconnected(keys[index], { TabId: tabId, FrameId: frameId ?? 0 }));
+            const message = EventMessage.create(keys[index], EventCommandType.Disconnected, { TabId: tabId, FrameId: frameId ?? 0 });
+
+            response(message);
         }
 
         port.onMessage.removeListener(this.onMessage);

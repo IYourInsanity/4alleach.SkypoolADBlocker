@@ -1,3 +1,4 @@
+import WaitHelper from "../../../common/helper/WaitHelper";
 import Guid from "../../../common/model/Guid";
 import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import Service from "../../../framework/service/Service";
@@ -37,8 +38,9 @@ export default class MainScriptInstallService extends Service implements IMainSc
 
         if(result === false) return false;
 
-        return new Promise<boolean>(setupFrameIdResolve => 
+        return new Promise<boolean>(async setupFrameIdResolve => 
         {
+            await WaitHelper.wait(500);
             $this.installFrame(tabId, frameId);
 
             setupFrameIdResolve(true);

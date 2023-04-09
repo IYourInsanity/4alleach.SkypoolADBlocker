@@ -1,7 +1,7 @@
 import Guid from "../../../../common/model/Guid";
 import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
-import EventCommand from "../../../../common/model/EventCommand";
+import { EventCommandType } from "../../../../common/model/EventCommandType";
 import { DocumentEventControllerService } from "../../service/DocumentEventControllerService";
 
 export default class PopupEventControllerService extends DocumentEventControllerService<IEventMessage, chrome.runtime.Port>
@@ -18,7 +18,7 @@ export default class PopupEventControllerService extends DocumentEventController
         if(this.isWork === true) return;
         this.isWork = true;
         
-        window.addEventListener(EventCommand.MessageToPopup, this.receiveCustomEvent);
+        window.addEventListener(EventCommandType.MessageToPopup, this.receiveCustomEvent);
     }
 
     protected override receive(message: IEventMessage, sender: chrome.runtime.Port): void 

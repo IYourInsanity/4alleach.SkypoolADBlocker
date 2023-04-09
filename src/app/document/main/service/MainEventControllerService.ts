@@ -1,10 +1,9 @@
 import Guid from "../../../../common/model/Guid";
 import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
-import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import EventGenerator from "../../../../common/helper/EventGenerator";
-import EventCommand from "../../../../common/model/EventCommand";
 import { DocumentEventControllerService } from "../../service/DocumentEventControllerService"
 import IMainEventControllerService from "./abstraction/IMainEventControllerService";
+import { EventCommandType } from "../../../../common/model/EventCommandType";
 
 export default class MainEventControllerService extends DocumentEventControllerService<IEventMessage, EventTarget | null> implements IMainEventControllerService
 {
@@ -20,24 +19,24 @@ export default class MainEventControllerService extends DocumentEventControllerS
         if(this.isWork === true) return;
         this.isWork = true;
 
-        window.addEventListener(EventCommand.MessageToMain, this.receiveCustomEvent);
+        window.addEventListener(EventCommandType.MessageToMain, this.receiveCustomEvent);
     }
 
     protected override receive(message: IEventMessage, sender: EventTarget | null): void 
     {
         switch(message.Event)
         {
-            case EventCommand.Ping:
+            /*case EventCommandType.Ping:
 
                 GlobalLogger.log('receive on main', message.Data, sender);
 
-                break;
+                break;*/
         }
     }
 
     public override send(message: IEventMessage): void
     {
-        const command = EventGenerator.generateCustomEvent(EventCommand.MessageToContent, message);
+        const command = EventGenerator.generateCustomEvent(EventCommandType.MessageToContent, message);
         window.dispatchEvent(command);
     }
 }

@@ -12,8 +12,6 @@ export abstract class DocumentEventControllerService<TData extends IEventMessage
     
     protected receiveCustomEvent(event: CustomEvent | Event): void 
     {
-        console.log('receiveCustomEvent', event);
-
         if(event instanceof CustomEvent)
         {
             this.receive(event.detail.Message, <TSender>event.target);

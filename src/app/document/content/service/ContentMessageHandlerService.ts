@@ -2,7 +2,7 @@ import Guid from "../../../../common/model/Guid";
 import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
-import EventCommand from "../../../../common/model/EventCommand";
+import { EventCommandType } from "../../../../common/model/EventCommandType";
 import ContentEventControllerService from "./ContentEventControllerService";
 import IContentEventControllerService from "./abstraction/IContentEventControllerService";
 import IContentMessageHandlerService from "./abstraction/IContentMessageHandlerService";
@@ -32,22 +32,20 @@ export default class ContentMessageHandlerService extends Service implements ICo
     {
         switch(message.Event)
         {
-            case EventCommand.MainScriptInstalled:
-            case EventCommand.MainScriptUninstalled:
-
-                console.log('MainScriptInstalled', message);
+            case EventCommandType.MainScriptInstalled:
+            case EventCommandType.MainScriptUninstalled:
 
                 chrome.runtime.sendMessage(message);
                 
                 break;
 
-            case 'test':
+            /*case 'test':
 
                 console.log('ContentMessageHandlerService', message);
 
                 (<chrome.runtime.Port>sender).postMessage(message);
 
-                break;
+                break;*/
         }
     }
 }

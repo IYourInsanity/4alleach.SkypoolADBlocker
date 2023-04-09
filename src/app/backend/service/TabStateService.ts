@@ -1,7 +1,7 @@
 import Guid from "../../../common/model/Guid";
 import Service from "../../../framework/service/Service";
 import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
-import EventCommand from "../../../common/model/EventCommand";
+import { EventCommandType } from "../../../common/model/EventCommandType";
 import { FrameInfo, FrameState } from "../model/tab/FrameInfo";
 import { TabInfo, TabState } from "../model/tab/TabInfo";
 import BackendEventControllerService from "./BackendEventControllerService";
@@ -73,7 +73,7 @@ export default class TabStateService extends Service implements ITabStateService
 
         switch(message.Event)
         {
-            case EventCommand.MainScriptInstalled:
+            case EventCommandType.MainScriptInstalled:
 
                 const frameInfo = this.tabs[tabId].Frames[frameId];
 
@@ -81,7 +81,7 @@ export default class TabStateService extends Service implements ITabStateService
                 frameInfo.State = FrameState.Loaded;
                 
                 break;
-            case EventCommand.MainScriptUninstalled:
+            case EventCommandType.MainScriptUninstalled:
 
                 delete this.tabs[tabId].Frames[frameId];
 
