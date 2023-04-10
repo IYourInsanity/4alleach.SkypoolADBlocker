@@ -71,7 +71,7 @@ export default class MainScriptInstallService extends Service implements IMainSc
 
         if(isInstalled === undefined)
         {
-            $this.installInternal(installResolve, ++attempt, tabId, frameId);
+            setTimeout(() => $this.installInternal(installResolve, ++attempt, tabId, frameId), 100);
             return;
         }
 
