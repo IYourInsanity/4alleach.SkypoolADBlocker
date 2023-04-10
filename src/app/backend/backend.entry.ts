@@ -5,6 +5,7 @@ import BackendEventControllerService from "./service/BackendEventControllerServi
 import TabStateService from "./service/TabStateService";
 import UrlService from "./service/UrlService";
 import MainScriptInstallService from "./service/MainScriptInstallService";
+import ExecuteJavaScriptService from "./service/ExecuteJavaScriptService";
 
 const config: IConfiguration = 
 {
@@ -23,6 +24,8 @@ export default class BackendStartup extends Startup<IConfiguration>
     {
         const serviceHub = this.serviceHub;
 
+        serviceHub.register(ExecuteJavaScriptService);
+        
         serviceHub.register(BackendEventControllerService);
         serviceHub.register(TabStateService);
         serviceHub.register(UrlService);

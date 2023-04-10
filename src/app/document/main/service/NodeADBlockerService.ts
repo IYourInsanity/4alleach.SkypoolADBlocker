@@ -39,6 +39,6 @@ export default class NodeADBlockerService extends Service implements INodeADBloc
             node.IsBlocked = true;
         }
 
-        GlobalLogger.log('[Blocked]', node.Value);
+        GlobalLogger.debug('[Blocked]', node.Value);
     }
 }

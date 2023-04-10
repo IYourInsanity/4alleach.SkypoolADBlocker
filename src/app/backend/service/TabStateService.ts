@@ -12,6 +12,7 @@ import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
 import ITabStateService from "./abstraction/ITabStateService";
 import IUrlService from "./abstraction/IUrlService";
 import { IEventMessage } from "../../../framework/abstraction/IEventMessage";
+import GlobalLogger from "../../../framework/logger/GlobalLogger";
 
 export default class TabStateService extends Service implements ITabStateService
 {
@@ -147,9 +148,17 @@ export default class TabStateService extends Service implements ITabStateService
 
     private async onCommited(details: chrome.webNavigation.WebNavigationFramedCallbackDetails, filters?: chrome.webNavigation.WebNavigationFramedCallbackDetails | undefined): Promise<void>
     {
+        const tabId = details.tabId;
+        const frameId = details.frameId;
+
         if(this.activeTabId === 0)
         {
-            this.activeTabId = details.tabId;
+            this.activeTabId = tabId;
+        }
+
+        if(frameId !== 0)
+        {
+            return;
         }
 
         const url = details.url;
@@ -158,9 +167,6 @@ export default class TabStateService extends Service implements ITabStateService
         {
             return;
         }
-
-        const tabId = details.tabId;
-        const frameId = details.frameId;
 
         if(this.tabs[tabId].Frames[frameId] !== undefined)
         {

@@ -1,21 +1,24 @@
-import WaitHelper from "../../../common/helper/WaitHelper";
 import Guid from "../../../common/model/Guid";
-import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import Service from "../../../framework/service/Service";
+import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
 import ExtendedDocument from "../../document/global/ExtendedDocument";
+import ExecuteJavaScriptService from "./ExecuteJavaScriptService";
+import IExecuteJavaScriptService from "./abstraction/IExecuteJavaScriptService";
 import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
 
 export default class MainScriptInstallService extends Service implements IMainScriptInstallService
 {
     public static key: string = Guid.new();
     
-    private readonly maxAttempt: number;
-    
-    constructor()
-    {
-        super(MainScriptInstallService.key);
+    private scriptService: IExecuteJavaScriptService;
 
-        this.maxAttempt = 5;
+    private mainScriptFileName: string;
+
+    private maxAttempt: number;
+    
+    constructor(serviceHub: IServiceHub)
+    {
+        super(MainScriptInstallService.key, serviceHub);
 
         this.install = this.install.bind(this);
         this.installInternal = this.installInternal.bind(this);
@@ -25,98 +28,60 @@ export default class MainScriptInstallService extends Service implements IMainSc
     {
         if(this.isWork === true) return;
 
+        this.scriptService = this.serviceHub.get<IExecuteJavaScriptService>(ExecuteJavaScriptService);
+        this.maxAttempt = 5;
+        this.mainScriptFileName = './src/main.js';
+
         this.isWork = true;
     }
 
     public async install(tabId: number, frameId: number): Promise<boolean>
     {
         const $this = this;
-        const result = await new Promise<boolean>(installResolve => 
+        return await new Promise<boolean>(installResolve => 
         {
             $this.installInternal(installResolve, 0, tabId, frameId);
         });
-
-        if(result === false) return false;
-
-        return new Promise<boolean>(async setupFrameIdResolve => 
-        {
-            await WaitHelper.wait(500);
-            $this.installFrame(tabId, frameId);
-
-            setupFrameIdResolve(true);
-        });
     }
 
-    private installInternal(installResolve: (value: boolean) => void, attempt: number, tabId: number, frameId: number): void
+    private async installInternal(installResolve: (value: boolean) => void, attempt: number, tabId: number, frameId: number): Promise<void>
     {
         const $this = this;
-        setTimeout(async () => 
+
+        const document_installationCheck = function(): boolean
         {
-            let isInstalled: boolean = false;
+            //TODO: Rework it
+            while((document as ExtendedDocument) === undefined) { }
 
-            if(attempt === $this.maxAttempt)
-            {
-                installResolve(false);
-                return;
-            }
+            return true;
+        }
 
-            isInstalled = await new Promise<boolean>(installResolve => 
-            {
-                chrome.scripting.executeScript(
-                    {
-                        target: 
-                        {
-                            tabId: tabId,
-                            frameIds: [frameId]
-                        },
-                        world: 'MAIN',
-                        files: 
-                        [
-                            './src/main.js'
-                        ]
-                    })
-                    .catch(reason => 
-                        {
-                            GlobalLogger.error('Exception while try install main script', reason); 
-                            installResolve(false);
-                        })
-                    .then(() =>
-                        {
-                            installResolve(true);
-                        });
-            });
-
-            if(isInstalled === true)
-            {
-                installResolve(true);
-            }
-            else
-            {
-                $this.installInternal(installResolve, ++attempt, tabId, frameId);
-            }
-            
-        }, 100);
-    }
-
-    private installFrame(tabId: number, frameId: number): void
-    {
         const document_installFrame = function(frameId: number): void
         {
             (document as ExtendedDocument).API.installFrame(frameId);
         }
 
-        chrome.scripting.executeScript({
-            target: {
-                tabId: tabId,
-                frameIds: [frameId]
-            },
-            world: 'MAIN',
-            func: document_installFrame,
-            args: [frameId]
-        })
-        .catch(reason => 
-            { 
-                GlobalLogger.error('Exception while try Setup frame ID', reason); 
-            });
+        if(attempt === $this.maxAttempt)
+        {
+            installResolve(false);
+            return;
+        }
+
+        const isInstalled = await $this.scriptService.executeFileAsync(tabId, frameId, $this.mainScriptFileName);
+
+        if(isInstalled === undefined)
+        {
+            $this.installInternal(installResolve, ++attempt, tabId, frameId);
+            return;
+        }
+
+        const isExist = await $this.scriptService.executeScriptAsync(tabId, frameId, document_installationCheck);
+
+        if(isExist === false)
+        {
+            installResolve(false);
+        }
+
+        await $this.scriptService.executeScriptWithArgsAsync(tabId, frameId, [frameId], document_installFrame);
     }
 }
