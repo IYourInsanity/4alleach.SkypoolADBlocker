@@ -1,30 +1,33 @@
-import Guid from "../../../common/model/Guid";
 import Service from "../../../framework/service/Service";
 import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
-import { EventCommandType } from "../../../common/model/EventCommandType";
 import { FrameInfo, FrameState } from "../model/tab/FrameInfo";
 import { TabInfo, TabState } from "../model/tab/TabInfo";
-import BackendEventControllerService from "./BackendEventControllerService";
 import MainScriptInstallService from "./MainScriptInstallService";
 import UrlService from "./UrlService";
-import IBackendEventControllerService from "./abstraction/IBackendEventControllerService";
 import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
 import ITabStateService from "./abstraction/ITabStateService";
 import IUrlService from "./abstraction/IUrlService";
-import { IEventMessage } from "../../../framework/abstraction/IEventMessage";
-import GlobalLogger from "../../../framework/logger/GlobalLogger";
+import EventCallback from "../../../common/custom/EventCallback";
+import KeyGenerator from "../../../common/helper/KeyGenerator";
 
 export default class TabStateService extends Service implements ITabStateService
 {
-    public static key: string = Guid.new();
+    public static key: number = KeyGenerator.new();
 
     private readonly tabs: { [key: number]: TabInfo };
 
-    private eventService: IBackendEventControllerService;
     private urlService: IUrlService;
     private installService: IMainScriptInstallService;
 
     private activeTabId: number;
+
+    public OnTabCreated: EventCallback<number>;
+
+    public OnTabSwitched: EventCallback<{ TabId: number; PreviousTabId: number; IsValid: boolean; }>;
+
+    public OnTabRemoved: EventCallback<number>;
+
+    public OnTabCommited: EventCallback<number>;
 
     constructor(serviceHub: IServiceHub)
     {
@@ -33,7 +36,6 @@ export default class TabStateService extends Service implements ITabStateService
         this.tabs = {};
         this.activeTabId = 0;
 
-        this.receive = this.receive.bind(this);
         this.getActiveTabId = this.getActiveTabId.bind(this);
 
         this.onCreated = this.onCreated.bind(this);
@@ -47,12 +49,14 @@ export default class TabStateService extends Service implements ITabStateService
     public initialize(): void 
     {
         if(this.isWork === true) return;
+ 
+        this.OnTabCreated = new EventCallback();
+        this.OnTabSwitched = new EventCallback();
+        this.OnTabRemoved = new EventCallback();
+        this.OnTabCommited = new EventCallback();
 
-        this.isWork = true;
-
-        this.eventService = this.serviceHub.get<IBackendEventControllerService>(BackendEventControllerService);
-        this.installService = this.serviceHub.get<IMainScriptInstallService>(MainScriptInstallService);
-        this.urlService = this.serviceHub.get<IUrlService>(UrlService);
+        this.installService = this.serviceHub.get(MainScriptInstallService);
+        this.urlService = this.serviceHub.get(UrlService);
         
         chrome.tabs.onActivated.addListener(this.onSwitched);
         chrome.tabs.onCreated.addListener(this.onCreated); 
@@ -60,6 +64,8 @@ export default class TabStateService extends Service implements ITabStateService
         chrome.tabs.onRemoved.addListener(this.onRemoved);
 
         chrome.webNavigation.onCommitted.addListener(this.onCommited);
+
+        this.isWork = true;
     }
 
     public getActiveTabId(): number 
@@ -67,27 +73,20 @@ export default class TabStateService extends Service implements ITabStateService
         return this.activeTabId;
     }
 
-    private receive(message: IEventMessage, sender: chrome.runtime.MessageSender): void
+    public installContentScript(tabId: number, frameId: number): void
     {
-        const tabId = sender.tab!.id!;
-        const frameId = sender.frameId!;
+        const frameInfo = this.tabs[tabId].Frames[frameId];
 
-        switch(message.Event)
-        {
-            case EventCommandType.MainScriptInstalled:
+        frameInfo.ContentScriptInstalled = true;
+        frameInfo.State = FrameState.Loaded;
+    }
 
-                const frameInfo = this.tabs[tabId].Frames[frameId];
+    public installMainScript(tabId: number, frameId: number): void 
+    {
+        const frameInfo = this.tabs[tabId].Frames[frameId];
 
-                frameInfo.MainScriptInstalled = true;
-                frameInfo.State = FrameState.Loaded;
-                
-                break;
-            case EventCommandType.MainScriptUninstalled:
-
-                delete this.tabs[tabId].Frames[frameId];
-
-                break;
-        }
+        frameInfo.MainScriptInstalled = true;
+        frameInfo.State = FrameState.Loaded;
     }
 
     //#region Chrome Events
@@ -97,14 +96,13 @@ export default class TabStateService extends Service implements ITabStateService
         const tabId = tab.id!;
 
         this.tabs[tabId] = TabStateService.createTabInfo();
-        this.eventService.add(tabId, this.receive);
+        this.OnTabCreated.raise(tabId);
     }
 
     private onUpdated(tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab)
     {
         if(this.tabs[tabId] === undefined)
         {
-            this.eventService.add(tabId, this.receive);
             this.tabs[tabId] = TabStateService.createTabInfo();
         }
 
@@ -129,21 +127,24 @@ export default class TabStateService extends Service implements ITabStateService
         if(this.tabs[tabId] !== undefined)
         {
             delete this.tabs[tabId];
-            this.eventService.remove(tabId, this.receive);
         }
+
+        this.OnTabRemoved.raise(tabId);
     }
 
     private async onSwitched(info: chrome.tabs.TabActiveInfo): Promise<void>
     {
-        const tab = await chrome.tabs.get(info.tabId);
+        const previousTabId = this.activeTabId;
+        const currentTabId = info.tabId;
+
+        const tab = await chrome.tabs.get(currentTabId);
         const url = tab.url!;
 
-        /*if(this.urlService.validate(url) === false)
-        {
-            return;
-        }*/
+        const isValid = this.urlService.validate(url);
 
         this.activeTabId = info.tabId;
+
+        this.OnTabSwitched.raise({ TabId: currentTabId, PreviousTabId: previousTabId, IsValid: isValid });
     }
 
     private async onCommited(details: chrome.webNavigation.WebNavigationFramedCallbackDetails, filters?: chrome.webNavigation.WebNavigationFramedCallbackDetails | undefined): Promise<void>
@@ -179,6 +180,8 @@ export default class TabStateService extends Service implements ITabStateService
         {
             return;
         }
+
+        this.OnTabCommited.raise(tabId);
     }
 
     //#endregion

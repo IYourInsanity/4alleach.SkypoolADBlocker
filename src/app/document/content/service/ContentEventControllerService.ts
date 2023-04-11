@@ -1,22 +1,19 @@
-import Guid from "../../../../common/model/Guid";
 import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import { EventCommandType } from "../../../../common/model/EventCommandType";
 import ContentMessageHandlerService from "./ContentMessageHandlerService";
-import { DocumentEventControllerService } from "../../service/DocumentEventControllerService"
 import IContentEventControllerService from "./abstraction/IContentEventControllerService";
+import { BackendEventControllerService } from "../../service/BackendEventControllerService";
+import KeyGenerator from "../../../../common/helper/KeyGenerator";
 
-export default class ContentEventControllerService extends DocumentEventControllerService<IEventMessage, EventTarget | chrome.runtime.Port | null> implements IContentEventControllerService
+export default class ContentEventControllerService extends BackendEventControllerService<IEventMessage, EventTarget | chrome.runtime.Port | null> implements IContentEventControllerService
 {
-    public static key: string = Guid.new();
-
-    private port: chrome.runtime.Port;
-
+    public static key: number = KeyGenerator.new();
+    
     constructor()
     {
         super(ContentEventControllerService.key);
 
-        this.receiveBackendEvent = this.receiveBackendEvent.bind(this);
         this.receiveCustomEvent = this.receiveCustomEvent.bind(this);
     }
 
@@ -24,19 +21,16 @@ export default class ContentEventControllerService extends DocumentEventControll
     {
         if(this.isWork === true) return;
 
-        this.isWork = true;
-
-        this.port = chrome.runtime.connect({ name: ContentEventControllerService.key });
-        this.port.onMessage.addListener(this.receiveBackendEvent);
-
         window.addEventListener(EventCommandType.MessageToContent, this.receiveCustomEvent);
+
+        this.isWork = true;
     }
 
     protected override receive(message: IEventMessage, sender: EventTarget | chrome.runtime.Port | null): void 
     {
         if(message === undefined) return;
         
-        this.listeners[ContentMessageHandlerService.hash]?.forEach(listener => 
+        this.listeners[ContentMessageHandlerService.key]?.forEach(listener => 
         {
             try
             {
@@ -47,12 +41,5 @@ export default class ContentEventControllerService extends DocumentEventControll
                 GlobalLogger.error(`Error while receive event from ${ContentMessageHandlerService.key}`, exception);
             }
         });
-    }
-
-    private receiveBackendEvent(message: IEventMessage, port: chrome.runtime.Port): void
-    {
-        if(message === undefined) return;
-
-        this.receive(message, port);
     }
 }

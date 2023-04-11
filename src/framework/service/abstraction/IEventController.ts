@@ -1,6 +1,6 @@
 import { IEventMessage } from "../../abstraction/IEventMessage";
 
-export default interface IEventController<TData extends IEventMessage, TSender>
+export default interface IEventController<TData extends IEventMessage, TSender extends any>
 {
     send(value: TData): void;
 

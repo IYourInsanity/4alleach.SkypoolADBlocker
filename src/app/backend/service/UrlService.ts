@@ -1,18 +1,16 @@
-import Guid from "../../../common/model/Guid";
+import KeyGenerator from "../../../common/helper/KeyGenerator";
 import Service from "../../../framework/service/Service";
 import IUrlService from "./abstraction/IUrlService";
 
 export default class UrlService extends Service implements IUrlService
 {
-    public static key: string = Guid.new();
+    public static key: number = KeyGenerator.new();
 
-    private readonly exceptUrls: string[];
+    private exceptUrls: string[];
 
     constructor()
     {
         super(UrlService.key);
-
-        this.exceptUrls = [];
 
         this.initialize = this.initialize.bind(this);
         this.validate = this.validate.bind(this);
@@ -22,9 +20,9 @@ export default class UrlService extends Service implements IUrlService
     {
         if(this.isWork === true) return;
 
-        this.isWork = true;
+        this.exceptUrls = ['chrome://', 'chrome-://', 'edge://', 'edge-://', 'data:', 'devtools://', 'about:blank', 'chrome-extension://', 'chrome-untrusted://'];
 
-        this.exceptUrls.push(...['chrome://', 'chrome-://', 'edge://', 'edge-://', 'data:', 'devtools://', 'about:blank', 'chrome-extension://', 'chrome-untrusted://']);
+        this.isWork = true;
     }
 
     public validate(value: string): boolean

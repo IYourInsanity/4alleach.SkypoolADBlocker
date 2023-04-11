@@ -1,4 +1,5 @@
-import Guid from "../../../common/model/Guid";
+import KeyGenerator from "../../../common/helper/KeyGenerator";
+import WaitHelper from "../../../common/helper/WaitHelper";
 import Service from "../../../framework/service/Service";
 import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
 import ExtendedDocument from "../../document/global/ExtendedDocument";
@@ -8,7 +9,7 @@ import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
 
 export default class MainScriptInstallService extends Service implements IMainScriptInstallService
 {
-    public static key: string = Guid.new();
+    public static key: number = KeyGenerator.new();
     
     private scriptService: IExecuteJavaScriptService;
 
@@ -28,7 +29,7 @@ export default class MainScriptInstallService extends Service implements IMainSc
     {
         if(this.isWork === true) return;
 
-        this.scriptService = this.serviceHub.get<IExecuteJavaScriptService>(ExecuteJavaScriptService);
+        this.scriptService = this.serviceHub.get(ExecuteJavaScriptService);
         this.maxAttempt = 5;
         this.mainScriptFileName = './src/main.js';
 
@@ -71,7 +72,8 @@ export default class MainScriptInstallService extends Service implements IMainSc
 
         if(isInstalled === undefined)
         {
-            setTimeout(() => $this.installInternal(installResolve, ++attempt, tabId, frameId), 100);
+            await WaitHelper.wait(100);
+            $this.installInternal(installResolve, ++attempt, tabId, frameId);
             return;
         }
 

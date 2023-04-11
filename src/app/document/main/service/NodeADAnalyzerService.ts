@@ -1,3 +1,4 @@
+import KeyGenerator from "../../../../common/helper/KeyGenerator";
 import WaitHelper from "../../../../common/helper/WaitHelper";
 import Guid from "../../../../common/model/Guid";
 import Service from "../../../../framework/service/Service";
@@ -19,7 +20,7 @@ export default class NodeADAnalyzerService extends Service implements INodeADAna
 
     private static attrToCheck = ['id', 'class', 'alt', 'src', 'data', 'data-name'];
     
-    public static key: string = Guid.new();
+    public static key: number = KeyGenerator.new();
 
     private storageService: INodeStorageService;
 

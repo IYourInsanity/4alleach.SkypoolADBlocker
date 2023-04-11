@@ -1,4 +1,5 @@
 import EventCallback from "../../../../common/custom/EventCallback";
+import KeyGenerator from "../../../../common/helper/KeyGenerator";
 import Guid from "../../../../common/model/Guid";
 import Service from "../../../../framework/service/Service";
 import { StorageNode } from "../model/StorageNode";
@@ -6,7 +7,7 @@ import INodeStorageService from "./abstraction/INodeStorageService";
 
 export default class NodeStorageService extends Service implements INodeStorageService
 {
-    public static key: string = Guid.new();
+    public static key: number = KeyGenerator.new();
 
     private stash: { [key: string]: StorageNode };
 

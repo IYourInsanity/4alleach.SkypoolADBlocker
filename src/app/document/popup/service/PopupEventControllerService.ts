@@ -1,12 +1,12 @@
-import Guid from "../../../../common/model/Guid";
 import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import { EventCommandType } from "../../../../common/model/EventCommandType";
-import { DocumentEventControllerService } from "../../service/DocumentEventControllerService";
+import { BackendEventControllerService } from "../../service/BackendEventControllerService";
+import KeyGenerator from "../../../../common/helper/KeyGenerator";
 
-export default class PopupEventControllerService extends DocumentEventControllerService<IEventMessage, chrome.runtime.Port>
+export default class PopupEventControllerService extends BackendEventControllerService<IEventMessage, chrome.runtime.Port>
 {
-    public static key: string = Guid.new();
+    public static key: number = KeyGenerator.new();
 
     constructor()
     {
@@ -16,9 +16,13 @@ export default class PopupEventControllerService extends DocumentEventController
     public override initialize(): void 
     {
         if(this.isWork === true) return;
-        this.isWork = true;
-        
+
         window.addEventListener(EventCommandType.MessageToPopup, this.receiveCustomEvent);
+
+        //const message: IEventMessage = { MessageId: Guid.new(), Event: EventCommandType.ContentScriptInstalled, Data: {} };
+        //chrome.runtime.sendMessage(message);
+
+        this.isWork = true;
     }
 
     protected override receive(message: IEventMessage, sender: chrome.runtime.Port): void 

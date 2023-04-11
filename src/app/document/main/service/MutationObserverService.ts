@@ -1,4 +1,4 @@
-import Guid from "../../../../common/model/Guid";
+import KeyGenerator from "../../../../common/helper/KeyGenerator";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
 import NodeHandlerService from "./NodeADAnalyzerService";
@@ -6,7 +6,7 @@ import INodeHandlerService from "./abstraction/INodeADAnalyzerService";
 
 export default class MutationObserverService extends Service
 {
-    public static key: string = Guid.new();
+    public static key: number = KeyGenerator.new();
 
     private observer: MutationObserver;
     private handlerService: INodeHandlerService;

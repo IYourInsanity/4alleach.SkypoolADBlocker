@@ -1,4 +1,3 @@
-import Guid from "../../../../common/model/Guid";
 import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
@@ -6,11 +5,11 @@ import { EventCommandType } from "../../../../common/model/EventCommandType";
 import ContentEventControllerService from "./ContentEventControllerService";
 import IContentEventControllerService from "./abstraction/IContentEventControllerService";
 import IContentMessageHandlerService from "./abstraction/IContentMessageHandlerService";
+import KeyGenerator from "../../../../common/helper/KeyGenerator";
 
 export default class ContentMessageHandlerService extends Service implements IContentMessageHandlerService
 {
-    public static readonly key: string = Guid.new();
-    public static readonly hash: number = ContentMessageHandlerService.GetHashCode(ContentMessageHandlerService.key);
+    public static readonly key: number = KeyGenerator.new();
 
     private eventController: IContentEventControllerService;
 
@@ -25,7 +24,7 @@ export default class ContentMessageHandlerService extends Service implements ICo
         this.isWork = true;
 
         this.eventController = this.serviceHub.get<IContentEventControllerService>(ContentEventControllerService);
-        this.eventController.add(ContentMessageHandlerService.hash, this.receive);
+        this.eventController.add(ContentMessageHandlerService.key, this.receive);
     }
     
     private receive(message: IEventMessage, sender: EventTarget | chrome.runtime.Port | null): void
@@ -33,7 +32,7 @@ export default class ContentMessageHandlerService extends Service implements ICo
         switch(message.Event)
         {
             case EventCommandType.MainScriptInstalled:
-            case EventCommandType.MainScriptUninstalled:
+            case EventCommandType.NodeIsBlocked:
 
                 chrome.runtime.sendMessage(message);
                 

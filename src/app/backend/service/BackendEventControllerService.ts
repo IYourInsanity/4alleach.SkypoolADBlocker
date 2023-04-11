@@ -1,5 +1,6 @@
+import KeyGenerator from "../../../common/helper/KeyGenerator";
+import WaitHelper from "../../../common/helper/WaitHelper";
 import { EventCommandType } from "../../../common/model/EventCommandType";
-import Guid from "../../../common/model/Guid";
 import { ICancellationToken } from "../../../framework/abstraction/ICancellationToken";
 import { IEventMessage, EventMessage } from "../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../framework/logger/GlobalLogger";
@@ -9,11 +10,13 @@ import IBackendEventControllerService from "./abstraction/IBackendEventControlle
 
 export default class BackendEventControllerService extends EventController<IEventMessage, chrome.runtime.MessageSender> implements IBackendEventControllerService
 {
-    public static key: string = Guid.new();
+    public static key: number = KeyGenerator.new();
     
     private readonly responseTimeout: number;
 
     private readonly portHub: { [key: number]: {[key: number]: PortInfo} };
+
+    public extensionKey: number;
 
     constructor()
     {
@@ -30,24 +33,28 @@ export default class BackendEventControllerService extends EventController<IEven
         this.onMessage = this.onMessage.bind(this);
         this.onDisconnect = this.onDisconnect.bind(this);
         this.onRemoved = this.onRemoved.bind(this);
+
+        this.getKey = this.getKey.bind(this);
     }
 
     public override initialize(): void 
     {
         if(this.isWork === true) return;
 
-        this.isWork = true;
-
         chrome.runtime.onConnect.addListener(this.onConnect);
         chrome.runtime.onMessage.addListener(this.receive);
         chrome.tabs.onRemoved.addListener(this.onRemoved);
+
+        this.extensionKey = KeyGenerator.get(chrome.runtime.id);
+
+        this.isWork = true;
     }
     
     protected override receive(message: IEventMessage, sender: chrome.runtime.MessageSender): void 
     {
         if(message === undefined) return;
 
-        const key = sender.tab!.id!;
+        const key = this.getKey(sender);
 
         GlobalLogger.debug('Receive', message);
 
@@ -62,6 +69,11 @@ export default class BackendEventControllerService extends EventController<IEven
                 GlobalLogger.error(`Error while receive event from ${key}`, exception);
             }
         });
+    }
+
+    public sendToExtension(message: IEventMessage): void
+    {
+        chrome.runtime.sendMessage(message);
     }
 
     public sendOneWay(tabId: number, frameId: number, message: IEventMessage): void
@@ -95,6 +107,20 @@ export default class BackendEventControllerService extends EventController<IEven
                 $this.portHub[tabId][frameId].response[message.MessageId] = { resolve: resolve, timeoutId: timeoutId };
                 $this.portHub[tabId][frameId].port.postMessage(message);
             });
+    }
+
+    private getKey(sender: chrome.runtime.MessageSender): number
+    {
+        const key = sender?.tab?.id;
+
+        if(key !== undefined)
+        {
+            return key;
+        }
+        else
+        {
+            return this.extensionKey;
+        }
     }
 
     private onConnect(port: chrome.runtime.Port)
@@ -206,7 +232,7 @@ export default class BackendEventControllerService extends EventController<IEven
 
             while(isInitialized === false && token.IsCanceled === false)
             {
-                await new Promise(resolveWait => { setTimeout(resolveWait, 100) });
+                await WaitHelper.wait(100);
 
                 const portInfo =  $this.portHub[tabId];
 

@@ -1,6 +1,6 @@
 export default interface IService
 {
-    readonly key: string;
+    readonly key: number;
     
     initialize(): void;
 }

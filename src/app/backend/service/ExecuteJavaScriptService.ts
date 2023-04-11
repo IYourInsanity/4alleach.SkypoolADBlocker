@@ -1,11 +1,11 @@
-import Guid from "../../../common/model/Guid";
+import KeyGenerator from "../../../common/helper/KeyGenerator";
 import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import Service from "../../../framework/service/Service";
 import IExecuteJavaScriptService from "./abstraction/IExecuteJavaScriptService";
 
 export default class ExecuteJavaScriptService extends Service implements IExecuteJavaScriptService
 {
-    public static key: string = Guid.new();
+    public static key: number = KeyGenerator.new();
 
     private world: chrome.scripting.ExecutionWorld;
 

@@ -3,11 +3,11 @@ import GlobalLogger from "../logger/GlobalLogger";
 import Service from "./Service";
 import IEventController from "./abstraction/IEventController";
 
-export abstract class EventController<TData extends IEventMessage, TSender> extends Service implements IEventController<TData, TSender>
+export abstract class EventController<TData extends IEventMessage, TSender extends any> extends Service implements IEventController<TData, TSender>
 {
     protected readonly listeners: { [key: number]: ((event: TData, sender: TSender) => void)[] };
 
-    constructor(key: string)
+    constructor(key: number)
     {
         super(key);
 

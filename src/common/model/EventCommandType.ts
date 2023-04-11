@@ -6,10 +6,15 @@ export enum EventCommandType
     CancelByToken = "ce-command-message-to-cancel-by-token",
 
     MessageToPopup = "ce-command-message-to-popup",
+    MessageFromPopup = "ce-command-message-from-popup",
+
+    MessageToBackend = "ce-command-message-to-backend",
     MessageToContent = "ce-command-message-to-content",
     MessageToMain = "ce-command-message-to-main",
 
 
     MainScriptInstalled = "ce-command-main-script-installed",
-    MainScriptUninstalled = "ce-command-main-script-uninstalled"
+    ContentScriptInstalled = "ce-command-content-script-installed",
+
+    NodeIsBlocked = "ce-command-node-is-blocked"
 }

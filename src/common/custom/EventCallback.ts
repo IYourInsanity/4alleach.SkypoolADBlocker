@@ -31,11 +31,33 @@ export default class EventCallback<TData extends any>
 
     public addListener(callback: (event: TData) => void): void
     {
-        this.listeners.push(callback);
+        const listeners = this.listeners;
+
+        if(listeners.indexOf(callback) > -1)
+        {
+            return;
+        }
+
+        listeners.push(callback);
     }
 
     public removeListener(callback: (event: TData) => void): void
     {
-        this.listeners?.splice(this.listeners?.indexOf(callback), 1);
+        const listeners = this.listeners;
+
+        if(listeners === undefined)
+        {
+            return;
+        }
+
+        const index = listeners.indexOf(callback);
+
+        if(index === -1)
+        {
+            GlobalLogger.error('Can`t remove listener because, it already removed');
+            return;
+        }
+        
+        listeners.splice(index, 1);
     }
 }

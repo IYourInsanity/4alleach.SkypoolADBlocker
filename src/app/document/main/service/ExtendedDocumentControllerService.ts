@@ -1,4 +1,3 @@
-import Guid from "../../../../common/model/Guid";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
 import ExtendedDocument from "../../global/ExtendedDocument";
@@ -8,10 +7,11 @@ import MainEventControllerService from "./MainEventControllerService";
 import IExtendedDocumentControllerService from "./abstraction/IExtendedDocumentControllerService";
 import IMainEventControllerService from "./abstraction/IMainEventControllerService";
 import WaitHelper from "../../../../common/helper/WaitHelper";
+import KeyGenerator from "../../../../common/helper/KeyGenerator";
 
 export default class ExtendedDocumentControllerService extends Service implements IExtendedDocumentControllerService
 {
-    public static readonly key: string = Guid.new();
+    public static readonly key: number = KeyGenerator.new();
 
     private extendedDocument: ExtendedDocument;
     private eventService: IMainEventControllerService;
@@ -21,7 +21,6 @@ export default class ExtendedDocumentControllerService extends Service implement
         super(ExtendedDocumentControllerService.key, serviceHub);
 
         this.installFrame = this.installFrame.bind(this);
-        this.uninstallFrame = this.uninstallFrame.bind(this);
 
         this.getFrameIdAsync = this.getFrameIdAsync.bind(this);
     }
@@ -35,7 +34,6 @@ export default class ExtendedDocumentControllerService extends Service implement
         this.extendedDocument.API = 
         {
             installFrame: this.installFrame,
-            uninstallFrame: this.uninstallFrame,
             getFrameIdAsync: this.getFrameIdAsync
         };
 
@@ -46,12 +44,6 @@ export default class ExtendedDocumentControllerService extends Service implement
     {
         this.extendedDocument.FrameId = frameId;
         const message = EventGenerator.generateEventMessage(EventCommandType.MainScriptInstalled, { });
-        this.eventService.send(message);
-    }
-
-    private uninstallFrame(): void
-    {
-        const message = EventGenerator.generateEventMessage(EventCommandType.MainScriptUninstalled, { });
         this.eventService.send(message);
     }
 

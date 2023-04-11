@@ -3,13 +3,13 @@ import IServiceHub from "./abstraction/IServiceHub";
 
 export default abstract class Service implements IService
 {
-    public readonly key: string;
+    public readonly key: number;
 
     protected readonly serviceHub: IServiceHub;
 
     protected isWork: boolean;
 
-    constructor(key: string, serviceHub?: IServiceHub)
+    constructor(key: number, serviceHub?: IServiceHub)
     {
         this.key = key;
 
@@ -24,18 +24,4 @@ export default abstract class Service implements IService
     }
 
     public abstract initialize(): void;
-
-    protected static GetHashCode(value: string): number
-    {
-        let hash = 0;
-
-        for (var i = 0; i < value.length; i++) 
-        {
-            let code = value.charCodeAt(i);
-            hash = ((hash<<5)-hash)+code;
-            hash = hash & hash;
-        }
-        
-        return hash;
-    }
 }

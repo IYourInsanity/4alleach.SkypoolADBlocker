@@ -5,6 +5,8 @@ export interface IEventMessage
 {
    readonly MessageId: string;
 
+   readonly Direct?: EventCommandType;
+
    readonly Event: EventCommandType;
 
    readonly Data: any;

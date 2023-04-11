@@ -6,6 +6,8 @@ import TabStateService from "./service/TabStateService";
 import UrlService from "./service/UrlService";
 import MainScriptInstallService from "./service/MainScriptInstallService";
 import ExecuteJavaScriptService from "./service/ExecuteJavaScriptService";
+import BackendEventMessageHandlerService from "./service/BackendEventMessageHandlerService";
+import PopupMessageHandlerService from "./service/PopupMessageHandlerService";
 
 const config: IConfiguration = 
 {
@@ -24,10 +26,13 @@ export default class BackendStartup extends Startup<IConfiguration>
     {
         const serviceHub = this.serviceHub;
 
+        serviceHub.register(TabStateService);
         serviceHub.register(ExecuteJavaScriptService);
         
         serviceHub.register(BackendEventControllerService);
-        serviceHub.register(TabStateService);
+        serviceHub.register(BackendEventMessageHandlerService);
+        serviceHub.register(PopupMessageHandlerService);
+        
         serviceHub.register(UrlService);
         serviceHub.register(MainScriptInstallService);
 

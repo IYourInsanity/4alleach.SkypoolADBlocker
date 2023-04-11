@@ -3,7 +3,7 @@ import { EventController } from "../../../framework/service/EventController";
 
 export abstract class DocumentEventControllerService<TData extends IEventMessage, TSender> extends EventController<TData, TSender>
 {
-    constructor(key: string)
+    constructor(key: number)
     {
         super(key);
 

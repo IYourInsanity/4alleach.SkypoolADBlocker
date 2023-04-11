@@ -1,13 +1,13 @@
-import Guid from "../../../../common/model/Guid";
 import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import EventGenerator from "../../../../common/helper/EventGenerator";
 import { DocumentEventControllerService } from "../../service/DocumentEventControllerService"
 import IMainEventControllerService from "./abstraction/IMainEventControllerService";
 import { EventCommandType } from "../../../../common/model/EventCommandType";
+import KeyGenerator from "../../../../common/helper/KeyGenerator";
 
 export default class MainEventControllerService extends DocumentEventControllerService<IEventMessage, EventTarget | null> implements IMainEventControllerService
 {
-    public static key: string = Guid.new();
+    public static key: number = KeyGenerator.new();
 
     constructor()
     {

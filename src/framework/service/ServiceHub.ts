@@ -1,16 +1,18 @@
-import Guid from "../../common/model/Guid";
+import KeyGenerator from "../../common/helper/KeyGenerator";
+import WaitHelper from "../../common/helper/WaitHelper";
 import GlobalLogger from "../logger/GlobalLogger";
 import IService from "./abstraction/IService";
 import IServiceHub from "./abstraction/IServiceHub";
+import { ServiceInfo } from "./model/ServiceInfo";
 
 export default class ServiceHub implements IServiceHub
 {
-    readonly key: string;
-    private readonly store: { [key: string]: IService };
+    readonly key: number;
+    private readonly store: { [key: number]: ServiceInfo };
 
     constructor()
     {
-        this.key = Guid.new();
+        this.key = KeyGenerator.new();
         this.store = {};
 
         this.initialize = this.initialize.bind(this);
@@ -20,9 +22,14 @@ export default class ServiceHub implements IServiceHub
 
     public initialize(): void 
     {
-        for(let key in this.store)
+        const serviceInfos = Object.values(this.store)
+                                   .sort((a, b) => a.Priority - b.Priority);
+
+        const length = serviceInfos.length;
+
+        for (let i = 0; i < length; i++) 
         {
-            this.store[key].initialize();
+            WaitHelper.execInPromise(serviceInfos[i].Service.initialize);
         }
     }
 
@@ -32,7 +39,7 @@ export default class ServiceHub implements IServiceHub
         try
         {
             const key = (option as any).key;
-            this.store[key] = new option(this);
+            this.store[key] = { Key: key, Priority: option.length, Service: new option(this) };
         }
         catch(exception)
         {
@@ -53,7 +60,7 @@ export default class ServiceHub implements IServiceHub
         try
         {
             const key = (option as any).key;
-            service = this.store[key] as TService;
+            service = <TService>this.store[key].Service;
         }
         catch(exception)
         {

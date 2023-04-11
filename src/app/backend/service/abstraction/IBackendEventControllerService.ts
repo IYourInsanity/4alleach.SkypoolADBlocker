@@ -4,6 +4,10 @@ import IService from "../../../../framework/service/abstraction/IService";
 
 export default interface IBackendEventControllerService extends IService
 {
+    extensionKey: number;
+
+    sendToExtension(message: IEventMessage): void;
+
     sendOneWay(tabId: number, frameId: number, message: IEventMessage): void
 
     sendAsync(tabId: number, frameId: number, message: IEventMessage, token: ICancellationToken): Promise<IEventMessage>

@@ -3,6 +3,8 @@ export interface FrameInfo
     State: FrameState;
 
     MainScriptInstalled?: boolean;
+
+    ContentScriptInstalled?: boolean;
 }
 
 export enum FrameState
