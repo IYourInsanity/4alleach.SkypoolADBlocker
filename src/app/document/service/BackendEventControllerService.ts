@@ -11,11 +11,11 @@ export abstract class BackendEventControllerService<TData extends IEventMessage,
     {
         super(key);
 
+        this.receiveBackendEvent = this.receiveBackendEvent.bind(this);
+
         this.portKey = Guid.new();
         this.port = chrome.runtime.connect({ name: this.portKey });
         this.port.onMessage.addListener(this.receiveBackendEvent);
-
-        this.receiveBackendEvent = this.receiveBackendEvent.bind(this);
     }
 
     protected receiveBackendEvent(message: TData, port: chrome.runtime.Port): void

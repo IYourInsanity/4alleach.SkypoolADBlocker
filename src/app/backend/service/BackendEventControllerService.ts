@@ -73,7 +73,8 @@ export default class BackendEventControllerService extends EventController<IEven
 
     public sendToExtension(message: IEventMessage): void
     {
-        chrome.runtime.sendMessage(message);
+        this.portHub[this.extensionKey][0].port.postMessage(message);
+        //chrome.runtime.sendMessage(message);
     }
 
     public sendOneWay(tabId: number, frameId: number, message: IEventMessage): void
@@ -126,8 +127,10 @@ export default class BackendEventControllerService extends EventController<IEven
     private onConnect(port: chrome.runtime.Port)
     {
         const sender = port.sender!;
-        const tabId = sender.tab!.id!;
-        const frameId = sender.frameId!;
+        const tabId = this.getKey(sender);
+        const frameId = sender.frameId ?? 0;
+
+        console.log('onConnect', port);
 
         let collection = this.portHub[tabId];
 
@@ -145,8 +148,8 @@ export default class BackendEventControllerService extends EventController<IEven
     private onDisconnect(port: chrome.runtime.Port): void
     {
         const sender = port.sender!;
-        const tabId = sender.tab!.id!;
-        const frameId = sender.frameId!;
+        const tabId = this.getKey(sender);
+        const frameId = sender.frameId ?? 0;
 
         let collection = this.portHub[tabId];
 

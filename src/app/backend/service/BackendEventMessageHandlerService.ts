@@ -1,13 +1,13 @@
 import KeyGenerator from "../../../common/helper/KeyGenerator";
 import { EventCommandType } from "../../../common/model/EventCommandType";
 import { IEventMessage } from "../../../framework/abstraction/IEventMessage";
+import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import Service from "../../../framework/service/Service";
 import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
 import BackendPopupEventControllerService from "./PopupMessageHandlerService";
 import TabStateService from "./TabStateService";
 import IBackendEventControllerService from "./abstraction/IBackendEventControllerService";
 import IBackendEventMessageHandlerService from "./abstraction/IBackendEventMessageHandlerService";
-import IBackendPopupEventControllerService from "./abstraction/IPopupMessageHandlerService";
 import ITabStateService from "./abstraction/ITabStateService";
 
 export default class BackendEventMessageHandlerService extends Service implements IBackendEventMessageHandlerService
@@ -15,7 +15,6 @@ export default class BackendEventMessageHandlerService extends Service implement
     public static key: number = KeyGenerator.new();
     
     private tabService: ITabStateService;
-    private popupService: IBackendPopupEventControllerService;
     private eventController: IBackendEventControllerService;
 
     constructor(serviceHub: IServiceHub)
@@ -34,11 +33,10 @@ export default class BackendEventMessageHandlerService extends Service implement
 
         this.eventController = this.serviceHub.get(BackendEventMessageHandlerService);
         this.tabService = this.serviceHub.get(TabStateService);
-        this.popupService = this.serviceHub.get(BackendPopupEventControllerService);
 
         this.tabService.OnTabCreated.addListener(this.onTabCreated);
         this.tabService.OnTabRemoved.addListener(this.onTabRemoved);
-        
+
         this.isWork = true;
     }
 
@@ -46,6 +44,8 @@ export default class BackendEventMessageHandlerService extends Service implement
     {
         const tabId = sender.tab!.id!;
         const frameId = sender.frameId!;
+
+        GlobalLogger.log('BackendEventMessageHandlerService', message, sender);
 
         switch(message.Event)
         {
@@ -60,12 +60,6 @@ export default class BackendEventMessageHandlerService extends Service implement
                 console.log('ContentScriptInstalled', message);
 
                 this.tabService.installContentScript(tabId, frameId);
-
-                break;
-
-            case EventCommandType.NodeIsBlocked: 
-
-                this.popupService.receive(message, sender);
 
                 break;
         }

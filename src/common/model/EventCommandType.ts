@@ -16,5 +16,7 @@ export enum EventCommandType
     MainScriptInstalled = "ce-command-main-script-installed",
     ContentScriptInstalled = "ce-command-content-script-installed",
 
+    GetTabInformationForPopup = "ce-command-get-tab-information-for-popup",
+
     NodeIsBlocked = "ce-command-node-is-blocked"
 }
