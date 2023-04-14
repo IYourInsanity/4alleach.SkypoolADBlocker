@@ -1,11 +1,9 @@
-import { EventCommandType } from "../../../common/model/EventCommandType";
 import Guid from "../../../common/model/Guid";
-import { IEventMessage } from "../../../framework/abstraction/IEventMessage";
 import Startup from "../../../framework/entry/Startup";
 import { IConfiguration } from "../../../framework/entry/abstraction/IConfiguration";
-import NodeRenderManager from "./manager/NodeRenderManager";
-import PageManager from "./manager/PageManager";
 import PopupEventControllerService from "./service/PopupEventControllerService";
+import PopupMessageHandlerService from "./service/PopupMessageHandlerService";
+import PopupPageRenderService from "./service/PopupPageRenderService";
 
 const config: IConfiguration = 
 {
@@ -22,18 +20,15 @@ export default class PopupStartup extends Startup<IConfiguration>
 
     protected configure(config: IConfiguration): void 
     {
-        this.serviceHub.register(PopupEventControllerService);
+        const serviceHub = this.serviceHub;
 
-        const pageManager = new PageManager();
-        pageManager.initialize();
-
-        const renderManager = new NodeRenderManager(config, pageManager);
-        renderManager.initialize();
-
+        serviceHub.register(PopupEventControllerService);
+        serviceHub.register(PopupMessageHandlerService);
+        serviceHub.register(PopupPageRenderService);
 
         //TODO Initialize Services, Managers and etc.
 
-        this.serviceHub.initialize();
+        serviceHub.initialize();
     }
 }
 

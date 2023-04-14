@@ -6,5 +6,5 @@ export default interface IServiceHub extends IService
 
     register<TService extends IService>(option: new(serviceHub: IServiceHub) => TService): void;
 
-    get<TService extends IService>(option: Function): TService;
+    getAsync<TService extends IService>(option: Function): Promise<TService>;
 }

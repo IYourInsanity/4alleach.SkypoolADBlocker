@@ -24,4 +24,9 @@ export abstract class BackendEventControllerService<TData extends IEventMessage,
 
         this.receive(message, <TSender>port);
     }
+
+    public override send(value: TData): void 
+    {
+        chrome.runtime.sendMessage(value);
+    }
 }

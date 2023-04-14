@@ -17,10 +17,10 @@ export default class ServiceHub implements IServiceHub
 
         this.initialize = this.initialize.bind(this);
         this.register = this.register.bind(this);
-        this.get = this.get.bind(this);
+        this.getAsync = this.getAsync.bind(this);
     }
 
-    public initialize(): void 
+    public initialize(): void | Promise<void>
     {
         const serviceInfos = Object.values(this.store)
                                    .sort((a, b) => a.Priority - b.Priority);
@@ -38,8 +38,9 @@ export default class ServiceHub implements IServiceHub
     {
         try
         {
-            const key = (option as any).key;
-            this.store[key] = { Key: key, Priority: option.length, Service: new option(this) };
+            const key: number = option.prototype.constructor.key;
+            const priority: number = option.prototype.constructor.priority;
+            this.store[key] = { Key: key, Priority: priority + option.length, Service: new option(this) };
         }
         catch(exception)
         {
@@ -47,7 +48,7 @@ export default class ServiceHub implements IServiceHub
         }
     }
 
-    public get<TService extends IService>(option: Function): TService
+    public async getAsync<TService extends IService>(option: Function): Promise<TService>
     {
         let service: TService = <TService>{};
 
@@ -57,15 +58,26 @@ export default class ServiceHub implements IServiceHub
             return service;
         }
 
-        try
+        service = await new Promise(async resolve => 
         {
-            const key = (option as any).key;
-            service = <TService>this.store[key].Service;
-        }
-        catch(exception)
-        {
-            GlobalLogger.error('Error while get service', exception);
-        }
+            let promService: TService | undefined = undefined;
+
+            while(promService === undefined)
+            {
+                try
+                {
+                    await WaitHelper.wait(10);
+                    const key: number = option.prototype.constructor.key;
+                    promService = <TService>this.store[key].Service;
+                }
+                catch(exception)
+                {
+                    GlobalLogger.error('Error while get service', exception);
+                }
+            }
+            
+            resolve(promService);
+        });
 
         return service;
     }

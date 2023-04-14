@@ -3,9 +3,10 @@ import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import { EventCommandType } from "../../../../common/model/EventCommandType";
 import { BackendEventControllerService } from "../../service/BackendEventControllerService";
 import KeyGenerator from "../../../../common/helper/KeyGenerator";
-import Guid from "../../../../common/model/Guid";
+import IPopupEventControllerService from "../abstraction/IPopupEventControllerService";
+import PopupMessageHandlerService from "./PopupMessageHandlerService";
 
-export default class PopupEventControllerService extends BackendEventControllerService<IEventMessage, chrome.runtime.Port>
+export default class PopupEventControllerService extends BackendEventControllerService<IEventMessage, chrome.runtime.Port> implements IPopupEventControllerService
 {
     public static key: number = KeyGenerator.new();
 
@@ -18,11 +19,6 @@ export default class PopupEventControllerService extends BackendEventControllerS
     {
         if(this.isWork === true) return;
 
-        window.addEventListener(EventCommandType.MessageToPopup, this.receiveCustomEvent);
-
-        const message: IEventMessage = { MessageId: Guid.new(), Direct: EventCommandType.MessageToPopup, Event: EventCommandType.GetTabInformationForPopup, Data: {} };
-        chrome.runtime.sendMessage(message);
-
         this.isWork = true;
     }
 
@@ -33,6 +29,16 @@ export default class PopupEventControllerService extends BackendEventControllerS
             return;
         }
         
-        GlobalLogger.log('receive on popup', message, sender);
+        this.listeners[PopupMessageHandlerService.key]?.forEach(listener => 
+        {
+            try
+            {
+                listener(message, sender);
+            }
+            catch (exception)
+            {
+                GlobalLogger.error(`Error while receive event from ${PopupMessageHandlerService.key}`, exception);
+            }
+        });
     }
 }

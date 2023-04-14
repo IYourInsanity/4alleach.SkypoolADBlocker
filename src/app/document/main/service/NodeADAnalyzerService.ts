@@ -47,7 +47,7 @@ export default class NodeADAnalyzerService extends Service implements INodeADAna
     {
         if(this.isWork === true) return;
 
-        this.storageService = this.serviceHub.get<INodeStorageService>(NodeStorageService);
+        this.storageService = await this.serviceHub.getAsync(NodeStorageService);
 
         this.isWork = true;
     }

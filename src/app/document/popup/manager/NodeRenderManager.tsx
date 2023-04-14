@@ -1,25 +1,24 @@
-import { IConfiguration } from "../../../../framework/entry/abstraction/IConfiguration";
 import { createRoot, Root } from "react-dom/client";
 import IManager from "../../../../framework/manager/abstraction/IManager";
-import PageManager from "./PageManager";
+import Guid from "../../../../common/model/Guid";
+import { BlockedData } from "../page/model/BlockedData";
+import { Page } from "../page/Page";
 
 export default class NodeRenderManager implements IManager
 {
-    private readonly key: string;
-    private readonly pageManager: PageManager;
-
     private container: HTMLDivElement;
     private root: Root;
+    private page: Page;
+
+    private model: BlockedData;
 
     public isInitialized: boolean;
 
-    constructor(config: IConfiguration, pageManager: PageManager)
+    constructor()
     {
-        this.key = config.key;
-        this.pageManager = pageManager;
-        this.isInitialized = false;
-
         this.initialize = this.initialize.bind(this);
+        this.render = this.render.bind(this);
+        this.update = this.update.bind(this);
     }
 
     public initialize(): void
@@ -30,15 +29,24 @@ export default class NodeRenderManager implements IManager
         }
 
         this.isInitialized = true;
+
+        this.model = new BlockedData();
         this.container = document.createElement('div');
 
         document.body.appendChild(this.container);
 
-        this.root = createRoot(this.container, { identifierPrefix: this.key });
-
-        //TODO:Rework it
-        const defaultPage = this.pageManager.getPages()[0].get();
-
-        this.root.render(defaultPage);
+        this.root = createRoot(this.container, { identifierPrefix: Guid.new() }); 
     }
+
+    public render(): void
+    {
+        this.page = new Page(this.model);
+        this.root.render(this.page.render());
+    }
+
+    public update(data: any[]): void
+    {
+        this.page.update(data.length);
+    }
+
 }

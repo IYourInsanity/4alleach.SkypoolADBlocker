@@ -25,11 +25,11 @@ export default class MainScriptInstallService extends Service implements IMainSc
         this.installInternal = this.installInternal.bind(this);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
 
-        this.scriptService = this.serviceHub.get(ExecuteJavaScriptService);
+        this.scriptService = await this.serviceHub.getAsync(ExecuteJavaScriptService);
         this.maxAttempt = 5;
         this.mainScriptFileName = './src/main.js';
 
@@ -85,5 +85,7 @@ export default class MainScriptInstallService extends Service implements IMainSc
         }
 
         await $this.scriptService.executeScriptWithArgsAsync(tabId, frameId, [frameId], document_installFrame);
+
+        installResolve(true);
     }
 }

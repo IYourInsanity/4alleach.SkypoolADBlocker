@@ -7,7 +7,7 @@ import UrlService from "./service/UrlService";
 import MainScriptInstallService from "./service/MainScriptInstallService";
 import ExecuteJavaScriptService from "./service/ExecuteJavaScriptService";
 import BackendEventMessageHandlerService from "./service/BackendEventMessageHandlerService";
-import PopupMessageHandlerService from "./service/PopupMessageHandlerService";
+import CollectorDataService from "./service/CollectorDataService";
 
 const config: IConfiguration = 
 {
@@ -31,10 +31,11 @@ export default class BackendStartup extends Startup<IConfiguration>
         
         serviceHub.register(BackendEventControllerService);
         serviceHub.register(BackendEventMessageHandlerService);
-        serviceHub.register(PopupMessageHandlerService);
         
         serviceHub.register(UrlService);
         serviceHub.register(MainScriptInstallService);
+
+        serviceHub.register(CollectorDataService);
 
         serviceHub.initialize();
         

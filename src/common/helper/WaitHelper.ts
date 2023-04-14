@@ -1,3 +1,5 @@
+import GlobalLogger from "../../framework/logger/GlobalLogger";
+
 export default class WaitHelper
 {
     public static wait(timeout: number): Promise<void>
@@ -13,7 +15,10 @@ export default class WaitHelper
                 {
                     callback();
                 }
-                catch { }
+                catch (exception)
+                {
+                    GlobalLogger.error('execInPromise', exception);
+                }
                 finally
                 {
                     resolve();

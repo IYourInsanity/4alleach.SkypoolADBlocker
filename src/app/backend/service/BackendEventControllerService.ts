@@ -56,7 +56,7 @@ export default class BackendEventControllerService extends EventController<IEven
 
         const key = this.getKey(sender);
 
-        GlobalLogger.debug('Receive', message);
+        GlobalLogger.debug('Receive', message, this.listeners);
 
         this.listeners[key]?.forEach(listener => 
         {
@@ -74,7 +74,6 @@ export default class BackendEventControllerService extends EventController<IEven
     public sendToExtension(message: IEventMessage): void
     {
         this.portHub[this.extensionKey][0].port.postMessage(message);
-        //chrome.runtime.sendMessage(message);
     }
 
     public sendOneWay(tabId: number, frameId: number, message: IEventMessage): void
@@ -129,8 +128,6 @@ export default class BackendEventControllerService extends EventController<IEven
         const sender = port.sender!;
         const tabId = this.getKey(sender);
         const frameId = sender.frameId ?? 0;
-
-        console.log('onConnect', port);
 
         let collection = this.portHub[tabId];
 

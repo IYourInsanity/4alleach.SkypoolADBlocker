@@ -23,5 +23,5 @@ export default abstract class Service implements IService
         this.initialize = this.initialize.bind(this);
     }
 
-    public abstract initialize(): void;
+    public abstract initialize(): void | Promise<void>;
 }

@@ -18,12 +18,12 @@ export default class MutationObserverService extends Service
         this.nodeMutation = this.nodeMutation.bind(this);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
         this.isWork = true;
 
-        this.handlerService = this.serviceHub.get<INodeHandlerService>(NodeHandlerService);
+        this.handlerService = await this.serviceHub.getAsync(NodeHandlerService);
 
         this.observer = new MutationObserver(this.nodeMutation);
         this.observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });

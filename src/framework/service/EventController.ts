@@ -64,7 +64,7 @@ export abstract class EventController<TData extends IEventMessage, TSender exten
         listener.splice(index, 1);
     }
 
-    public initialize(): void 
+    public initialize(): void
     {
         throw new Error("Method not implemented.");
     }

@@ -14,7 +14,6 @@ export default class ExtendedDocumentControllerService extends Service implement
     public static readonly key: number = KeyGenerator.new();
 
     private extendedDocument: ExtendedDocument;
-    private eventService: IMainEventControllerService;
 
     constructor(serviceHub: IServiceHub)
     {
@@ -25,7 +24,7 @@ export default class ExtendedDocumentControllerService extends Service implement
         this.getFrameIdAsync = this.getFrameIdAsync.bind(this);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
         this.isWork = true;
@@ -36,15 +35,16 @@ export default class ExtendedDocumentControllerService extends Service implement
             installFrame: this.installFrame,
             getFrameIdAsync: this.getFrameIdAsync
         };
-
-        this.eventService = this.serviceHub.get<IMainEventControllerService>(MainEventControllerService);
     }
 
-    private installFrame(frameId: number): void
+    private async installFrame(frameId: number): Promise<void>
     {
         this.extendedDocument.FrameId = frameId;
+        
         const message = EventGenerator.generateEventMessage(EventCommandType.MainScriptInstalled, { });
-        this.eventService.send(message);
+        const service = await this.serviceHub.getAsync<IMainEventControllerService>(MainEventControllerService);
+
+        service.send(message);
     }
 
     private async getFrameIdAsync(): Promise<number>

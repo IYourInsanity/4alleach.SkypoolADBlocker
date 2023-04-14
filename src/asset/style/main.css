@@ -1,0 +1,72 @@
+body
+{
+    width: 180px;
+    height: 240px;
+    background-color: #292a2d;
+}
+
+.title-container
+{
+    height: 90px;
+}
+
+.title-location
+{
+    position: relative;
+    vertical-align: top;
+    margin-top: 10px;
+    height: 40px;
+}
+
+.title-img
+{
+    width: 84;
+    height: 29;
+    position: absolute;
+    top:60px;
+    left:100px;
+}
+
+.title-font-size
+{
+    font-size: 32pt;
+}
+
+.url-container
+{
+    height: 40px;
+}
+
+.url-location
+{
+    margin: 10px;
+}
+
+.url-font-size
+{
+    font-size: 14pt;
+}
+
+.blocker-font-size
+{
+    font-size: 12pt;
+}
+
+.div-separator
+{
+    border: 2px solid #383838;
+}
+
+.pos-center
+{
+    width: auto;
+    text-align: center;
+}
+
+.font-style
+{
+    font-family:'Segoe UI';
+    font-weight: bold;
+    color: white;
+}
+

@@ -9,6 +9,7 @@ import ITabStateService from "./abstraction/ITabStateService";
 import IUrlService from "./abstraction/IUrlService";
 import EventCallback from "../../../common/custom/EventCallback";
 import KeyGenerator from "../../../common/helper/KeyGenerator";
+import GlobalLogger from "../../../framework/logger/GlobalLogger";
 
 export default class TabStateService extends Service implements ITabStateService
 {
@@ -46,7 +47,7 @@ export default class TabStateService extends Service implements ITabStateService
         this.onCommited = this.onCommited.bind(this);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
  
@@ -55,8 +56,8 @@ export default class TabStateService extends Service implements ITabStateService
         this.OnTabRemoved = new EventCallback();
         this.OnTabCommited = new EventCallback();
 
-        this.installService = this.serviceHub.get(MainScriptInstallService);
-        this.urlService = this.serviceHub.get(UrlService);
+        this.installService = await this.serviceHub.getAsync(MainScriptInstallService);
+        this.urlService = await this.serviceHub.getAsync(UrlService);
         
         chrome.tabs.onActivated.addListener(this.onSwitched);
         chrome.tabs.onCreated.addListener(this.onCreated); 

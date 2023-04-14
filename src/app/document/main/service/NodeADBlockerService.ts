@@ -1,6 +1,6 @@
-import EventGenerator from "../../../../common/helper/EventGenerator";
 import KeyGenerator from "../../../../common/helper/KeyGenerator";
 import { EventCommandType } from "../../../../common/model/EventCommandType";
+import { EventMessage } from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
@@ -24,15 +24,15 @@ export default class NodeADBlockerService extends Service implements INodeADBloc
         this.onSaved = this.onSaved.bind(this);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
         this.isWork = true;
 
-        this.storageService = this.serviceHub.get<INodeStorageService>(NodeStorageService);
+        this.storageService = await this.serviceHub.getAsync(NodeStorageService);
         this.storageService.onSaved.addListener(this.onSaved);
 
-        this.eventService = this.serviceHub.get<IMainEventControllerService>(MainEventControllerService);
+        this.eventService = await this.serviceHub.getAsync(MainEventControllerService);
     }
 
     private onSaved(key: string): void
@@ -48,7 +48,8 @@ export default class NodeADBlockerService extends Service implements INodeADBloc
 
         GlobalLogger.debug('[Blocked]', node.Value);
 
-        const command = EventGenerator.generateEventMessage(EventCommandType.NodeIsBlocked, { Tag: node.Value.nodeName });
-        this.eventService.send(command);
+        const message = EventMessage.new(EventCommandType.NodeIsBlocked, { Tag: node.Value.nodeName }, EventCommandType.MessageToBackend);
+
+        this.eventService.send(message);
     }
 }

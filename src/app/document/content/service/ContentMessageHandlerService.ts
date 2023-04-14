@@ -6,24 +6,27 @@ import ContentEventControllerService from "./ContentEventControllerService";
 import IContentEventControllerService from "./abstraction/IContentEventControllerService";
 import IContentMessageHandlerService from "./abstraction/IContentMessageHandlerService";
 import KeyGenerator from "../../../../common/helper/KeyGenerator";
+import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 
 export default class ContentMessageHandlerService extends Service implements IContentMessageHandlerService
 {
-    public static readonly key: number = KeyGenerator.new();
+    public static key: number = KeyGenerator.new();
 
     private eventController: IContentEventControllerService;
 
     constructor(serviceHub: IServiceHub)
     {
         super(ContentMessageHandlerService.key, serviceHub);
+
+        this.receive = this.receive.bind(this);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
         this.isWork = true;
 
-        this.eventController = this.serviceHub.get<IContentEventControllerService>(ContentEventControllerService);
+        this.eventController = await this.serviceHub.getAsync(ContentEventControllerService);
         this.eventController.add(ContentMessageHandlerService.key, this.receive);
     }
     
@@ -34,7 +37,9 @@ export default class ContentMessageHandlerService extends Service implements ICo
             case EventCommandType.MainScriptInstalled:
             case EventCommandType.NodeIsBlocked:
 
-                chrome.runtime.sendMessage(message);
+                GlobalLogger.log('ContentMessageHandlerService', message);
+
+                this.eventController.send(message);
                 
                 break;
 
