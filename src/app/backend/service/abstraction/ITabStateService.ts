@@ -1,9 +1,10 @@
 import EventCallback from "../../../../common/custom/EventCallback";
 import IService from "../../../../framework/service/abstraction/IService";
+import { ActiveTabInfo } from "../../model/tab/ActiveTabInfo";
 
 export default interface ITabStateService extends IService
 {
-    getActiveTabId(): number;
+    getActiveTabInfo(): ActiveTabInfo;
 
     installMainScript(tabId: number, frameId: number): void;
 

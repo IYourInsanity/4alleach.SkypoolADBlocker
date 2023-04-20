@@ -1,3 +1,4 @@
+import { BlockedNode } from "../../../common/model/BlockedNode";
 import UniqueIDGenerator from "../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../framework/service/Service";
 import ICollectorDataService from "./abstraction/ICollectorDataService";
@@ -7,7 +8,7 @@ export default class CollectorDataService extends Service implements ICollectorD
     public static key: UniqueID = UniqueIDGenerator.new();
     public static priority: ServicePriority = 0;
 
-    private stash:{[key: number]: any[]};
+    private stash:{[key: number]: BlockedNode[]};
 
     constructor()
     {
@@ -33,8 +34,13 @@ export default class CollectorDataService extends Service implements ICollectorD
         this.stash[tabId].push(data);
     }
 
-    public get(tabId: number): any[] 
+    public get(tabId: number): BlockedNode[] 
     {
-        return this.stash[tabId];
+        return this.stash[tabId] ?? [];
+    }
+
+    public clear(tabId: number): void
+    {
+        this.stash[tabId] = [];
     }
 }

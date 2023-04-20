@@ -5,7 +5,6 @@ import { EventCommandType } from "../../../../common/model/EventCommandType";
 import ContentEventControllerService from "./ContentEventControllerService";
 import IContentEventControllerService from "./abstraction/IContentEventControllerService";
 import IContentMessageHandlerService from "./abstraction/IContentMessageHandlerService";
-import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 
 export default class ContentMessageHandlerService extends Service implements IContentMessageHandlerService
@@ -38,19 +37,9 @@ export default class ContentMessageHandlerService extends Service implements ICo
             case EventCommandType.MainScriptInstalled:
             case EventCommandType.NodeIsBlocked:
 
-                GlobalLogger.log('ContentMessageHandlerService', message);
-
                 this.eventController.send(message);
                 
                 break;
-
-            /*case 'test':
-
-                console.log('ContentMessageHandlerService', message);
-
-                (<chrome.runtime.Port>sender).postMessage(message);
-
-                break;*/
         }
     }
 }

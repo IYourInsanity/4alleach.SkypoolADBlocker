@@ -9,6 +9,7 @@ import ITabStateService from "./abstraction/ITabStateService";
 import IUrlService from "./abstraction/IUrlService";
 import EventCallback from "../../../common/custom/EventCallback";
 import UniqueIDGenerator from "../../../framework/helper/UniqueIDGenerator";
+import { ActiveTabInfo } from "../model/tab/ActiveTabInfo";
 
 export default class TabStateService extends Service implements ITabStateService
 {
@@ -20,7 +21,7 @@ export default class TabStateService extends Service implements ITabStateService
     private urlService: IUrlService;
     private installService: IMainScriptInstallService;
 
-    private activeTabId: number;
+    private activeTabInfo: ActiveTabInfo;
 
     public OnTabCreated: EventCallback<number>;
 
@@ -35,9 +36,8 @@ export default class TabStateService extends Service implements ITabStateService
         super(TabStateService.key, serviceHub);
 
         this.tabs = {};
-        this.activeTabId = 0;
 
-        this.getActiveTabId = this.getActiveTabId.bind(this);
+        this.getActiveTabInfo = this.getActiveTabInfo.bind(this);
 
         this.onCreated = this.onCreated.bind(this);
         this.onUpdated = this.onUpdated.bind(this);
@@ -69,9 +69,9 @@ export default class TabStateService extends Service implements ITabStateService
         this.isWork = true;
     }
 
-    public getActiveTabId(): number 
+    public getActiveTabInfo(): ActiveTabInfo 
     {
-        return this.activeTabId;
+        return this.activeTabInfo;
     }
 
     public installContentScript(tabId: number, frameId: number): void
@@ -121,6 +121,15 @@ export default class TabStateService extends Service implements ITabStateService
         {
             this.tabs[tabId].State = TabState.Loaded;
         }
+
+        const url = changeInfo.url;
+        if(this.urlService.validate(url) === true)
+        {
+            this.activeTabInfo = {
+                TabId: tabId,
+                Url: this.urlService.getClear(url!)
+            };
+        }
     }
 
     private onRemoved(tabId: number, removeInfo: chrome.tabs.TabRemoveInfo): void
@@ -135,7 +144,7 @@ export default class TabStateService extends Service implements ITabStateService
 
     private async onSwitched(info: chrome.tabs.TabActiveInfo): Promise<void>
     {
-        const previousTabId = this.activeTabId;
+        const previousTabId = this.activeTabInfo?.TabId;
         const currentTabId = info.tabId;
 
         const tab = await chrome.tabs.get(currentTabId);
@@ -143,7 +152,13 @@ export default class TabStateService extends Service implements ITabStateService
 
         const isValid = this.urlService.validate(url);
 
-        this.activeTabId = info.tabId;
+        if(isValid === true)
+        {
+            this.activeTabInfo = {
+                TabId: info.tabId,
+                Url: this.urlService.getClear(url)
+            };
+        }
 
         this.OnTabSwitched.raise({ TabId: currentTabId, PreviousTabId: previousTabId, IsValid: isValid });
     }
@@ -152,11 +167,6 @@ export default class TabStateService extends Service implements ITabStateService
     {
         const tabId = details.tabId;
         const frameId = details.frameId;
-
-        if(this.activeTabId === 0)
-        {
-            this.activeTabId = tabId;
-        }
 
         if(frameId !== 0)
         {

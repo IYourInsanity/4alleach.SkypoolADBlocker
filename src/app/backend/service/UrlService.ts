@@ -26,7 +26,7 @@ export default class UrlService extends Service implements IUrlService
         this.isWork = true;
     }
 
-    public validate(value: string): boolean
+    public validate(value: string | undefined): boolean
     {
         if(typeof value !== 'string')
         {
@@ -39,6 +39,13 @@ export default class UrlService extends Service implements IUrlService
         }
 
         return true;
+    }
+
+    public getClear(value: string): string 
+    {
+        if(value === '') return value;
+
+        return new URL(value).host;
     }
 
 }

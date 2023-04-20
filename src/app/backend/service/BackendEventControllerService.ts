@@ -74,12 +74,21 @@ export default class BackendEventControllerService extends EventController<IEven
 
     public sendToExtension(message: IEventMessage): void
     {
-        if(this.portHub[this.extensionKey] === undefined)
+        const portInfos = this.portHub[this.extensionKey];
+
+        if(portInfos === undefined)
+        {
+            return;
+        }
+
+        const portInfo = portInfos[0];
+
+        if(portInfo === undefined)
         {
             return;
         }
         
-        this.portHub[this.extensionKey][0].port.postMessage(message);
+        portInfo.port.postMessage(message);
     }
 
     public sendOneWay(tabId: number, frameId: number, message: IEventMessage): void

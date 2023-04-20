@@ -1,4 +1,5 @@
 import { EventCommandType } from "../../../../common/model/EventCommandType";
+import { PopupData } from "../../../../common/model/PopupData";
 import { EventMessage, IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../../framework/service/Service";
@@ -47,7 +48,7 @@ export default class PopupMessageHandlerService extends Service implements IPopu
         {
             case EventCommandType.GetTabInformationForPopup: 
 
-                this.pageRenderService.updateData(message.Data);
+                this.pageRenderService.updateData(message.Data as PopupData);
 
                 break;
         }

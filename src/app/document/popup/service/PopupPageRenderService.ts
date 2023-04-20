@@ -1,3 +1,4 @@
+import { PopupData } from "../../../../common/model/PopupData";
 import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../../framework/service/Service";
 import IPopupPageRenderService from "../abstraction/IPopupPageRenderService";
@@ -28,7 +29,7 @@ export default class PopupPageRenderService extends Service implements IPopupPag
         this.isWork = true;
     }
 
-    public updateData(data: any[]): void 
+    public updateData(data: PopupData): void 
     {
         if(data === undefined)
         {

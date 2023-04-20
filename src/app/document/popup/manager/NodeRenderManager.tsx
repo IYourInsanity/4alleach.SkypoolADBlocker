@@ -1,8 +1,8 @@
 import { createRoot, Root } from "react-dom/client";
 import IManager from "../../../../framework/manager/abstraction/IManager";
 import Guid from "../../../../common/model/Guid";
-import { BlockedData } from "../page/model/BlockedData";
 import { Page } from "../page/Page";
+import { PopupData } from "../../../../common/model/PopupData";
 
 export default class NodeRenderManager implements IManager
 {
@@ -10,7 +10,7 @@ export default class NodeRenderManager implements IManager
     private root: Root;
     private page: Page;
 
-    private model: BlockedData;
+    private model: PopupData;
 
     public isInitialized: boolean;
 
@@ -29,8 +29,10 @@ export default class NodeRenderManager implements IManager
         }
 
         this.isInitialized = true;
-
-        this.model = new BlockedData();
+        this.model = { 
+            ActiveTabUrl: 'chrome page', 
+            BlockedNodes: [] 
+        };
         this.container = document.createElement('div');
 
         document.body.appendChild(this.container);
@@ -44,9 +46,9 @@ export default class NodeRenderManager implements IManager
         this.root.render(this.page.render());
     }
 
-    public update(data: any[]): void
+    public update(data: PopupData): void
     {
-        this.page.update(data.length);
+        this.page.update(data);
     }
 
 }

@@ -1,4 +1,5 @@
 import { EventCommandType } from "../../../common/model/EventCommandType";
+import { PopupData } from "../../../common/model/PopupData";
 import { EventMessage, IEventMessage } from "../../../framework/abstraction/IEventMessage";
 import UniqueIDGenerator from "../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../framework/service/Service";
@@ -29,6 +30,8 @@ export default class BackendEventMessageHandlerService extends Service implement
         this.onTabCreated = this.onTabCreated.bind(this);
         this.onTabRemoved = this.onTabRemoved.bind(this);
         this.onTabCommited = this.onTabCommited.bind(this);
+
+        this.sendUpdatesToPopup = this.sendUpdatesToPopup.bind(this);
     }
 
     public async initialize(): Promise<void> 
@@ -73,24 +76,41 @@ export default class BackendEventMessageHandlerService extends Service implement
    
                 const tabId = sender.tab!.id!;
 
-                this.collectorDataService.set(tabId, message.Data);
-
-                const request = EventMessage.create(message.MessageId, EventCommandType.GetTabInformationForPopup, [message.Data], EventCommandType.MessageToPopup);
-
-                this.eventController.sendToExtension(request);
+                this.nodeIsBlocked(tabId, message);
             
                 break;
 
             case EventCommandType.GetTabInformationForPopup:
 
-                const activeTabId = this.tabService.getActiveTabId();
-                const data = this.collectorDataService.get(activeTabId);
-                const response = EventMessage.create(message.MessageId, message.Event, data, EventCommandType.MessageToPopup);
-
-                this.eventController.sendToExtension(response);
+                this.sendUpdatesToPopup();
 
                 break;
         }
+    }
+
+    private nodeIsBlocked(tabId: number, message: IEventMessage): void
+    {
+        this.collectorDataService.set(tabId, message.Data);
+        this.sendUpdatesToPopup();
+    }
+
+    private sendUpdatesToPopup(): void
+    {
+        const info = this.tabService.getActiveTabInfo();
+
+        if(info === undefined)
+        {
+            return;
+        }
+
+        const data: PopupData = {
+            BlockedNodes: this.collectorDataService.get(info.TabId),
+            ActiveTabUrl: info.Url
+        }
+        
+        const request = EventMessage.new(EventCommandType.GetTabInformationForPopup, data, EventCommandType.MessageToPopup);
+
+        this.eventController.sendToExtension(request);
     }
 
     private onTabCreated(tabId: number): void
@@ -101,6 +121,7 @@ export default class BackendEventMessageHandlerService extends Service implement
     private onTabCommited(tabId: number): void
     {
         this.eventController.add(tabId, this.receive);
+        this.collectorDataService.clear(tabId);
     }
 
     private onTabRemoved(tabId: number): void
