@@ -5,12 +5,13 @@ import { EventCommandType } from "../../../../common/model/EventCommandType";
 import ContentEventControllerService from "./ContentEventControllerService";
 import IContentEventControllerService from "./abstraction/IContentEventControllerService";
 import IContentMessageHandlerService from "./abstraction/IContentMessageHandlerService";
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 
 export default class ContentMessageHandlerService extends Service implements IContentMessageHandlerService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 1;
 
     private eventController: IContentEventControllerService;
 

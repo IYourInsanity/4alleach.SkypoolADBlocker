@@ -1,6 +1,6 @@
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
 import { EventCommandType } from "../../../../common/model/EventCommandType";
 import { EventMessage, IEventMessage } from "../../../../framework/abstraction/IEventMessage";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
 import IPopupEventControllerService from "../abstraction/IPopupEventControllerService";
@@ -11,7 +11,8 @@ import PopupPageRenderService from "./PopupPageRenderService";
 
 export default class PopupMessageHandlerService extends Service implements IPopupMessageHandlerService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 1;
 
     private eventControllerService: IPopupEventControllerService;
     private pageRenderService: IPopupPageRenderService;

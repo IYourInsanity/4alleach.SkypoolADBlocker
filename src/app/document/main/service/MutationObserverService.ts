@@ -1,15 +1,16 @@
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
-import NodeHandlerService from "./NodeADAnalyzerService";
-import INodeHandlerService from "./abstraction/INodeADAnalyzerService";
+import NodeADAnalyzerService from "./NodeADAnalyzerService";
+import INodeADAnalyzerService from "./abstraction/INodeADAnalyzerService";
 
 export default class MutationObserverService extends Service
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 2;
 
     private observer: MutationObserver;
-    private handlerService: INodeHandlerService;
+    private handlerService: INodeADAnalyzerService;
 
     constructor(serviceHub: IServiceHub)
     {
@@ -23,7 +24,7 @@ export default class MutationObserverService extends Service
         if(this.isWork === true) return;
         this.isWork = true;
 
-        this.handlerService = await this.serviceHub.getAsync(NodeHandlerService);
+        this.handlerService = await this.serviceHub.getAsync(NodeADAnalyzerService);
 
         this.observer = new MutationObserver(this.nodeMutation);
         this.observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });

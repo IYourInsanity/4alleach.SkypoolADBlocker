@@ -1,5 +1,5 @@
-import KeyGenerator from "../../../common/helper/KeyGenerator";
-import WaitHelper from "../../../common/helper/WaitHelper";
+import AsyncHelper from "../../../framework/helper/AsyncHelper";
+import UniqueIDGenerator from "../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../framework/service/Service";
 import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
 import ExtendedDocument from "../../document/global/ExtendedDocument";
@@ -9,7 +9,8 @@ import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
 
 export default class MainScriptInstallService extends Service implements IMainScriptInstallService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
     
     private scriptService: IExecuteJavaScriptService;
 
@@ -72,7 +73,7 @@ export default class MainScriptInstallService extends Service implements IMainSc
 
         if(isInstalled === undefined)
         {
-            await WaitHelper.wait(100);
+            await AsyncHelper.wait(100);
             $this.installInternal(installResolve, ++attempt, tabId, frameId);
             return;
         }

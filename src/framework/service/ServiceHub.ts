@@ -1,5 +1,5 @@
-import KeyGenerator from "../../common/helper/KeyGenerator";
-import WaitHelper from "../../common/helper/WaitHelper";
+import AsyncHelper from "../helper/AsyncHelper";
+import UniqueIDGenerator from "../helper/UniqueIDGenerator";
 import GlobalLogger from "../logger/GlobalLogger";
 import IService from "./abstraction/IService";
 import IServiceHub from "./abstraction/IServiceHub";
@@ -7,12 +7,15 @@ import { ServiceInfo } from "./model/ServiceInfo";
 
 export default class ServiceHub implements IServiceHub
 {
-    readonly key: number;
+    public readonly key: UniqueID;
+
+    public isWork: boolean;
+
     private readonly store: { [key: number]: ServiceInfo };
 
     constructor()
     {
-        this.key = KeyGenerator.new();
+        this.key = UniqueIDGenerator.new();
         this.store = {};
 
         this.initialize = this.initialize.bind(this);
@@ -29,18 +32,27 @@ export default class ServiceHub implements IServiceHub
 
         for (let i = 0; i < length; i++) 
         {
-            WaitHelper.execInPromise(serviceInfos[i].Service.initialize);
+            serviceInfos[i].Service.initialize();
         }
+
+        this.isWork = true;
     }
 
     public register<TService extends IService>(option: new() => TService): void 
     public register<TService extends IService>(option: new(serviceHub: IServiceHub) => TService): void 
     {
+        if('key' in option === false || 'priority' in option === false)
+        {
+            GlobalLogger.error('Object is not a service', option);
+            return;
+        }
+
         try
         {
-            const key: number = option.prototype.constructor.key;
-            const priority: number = option.prototype.constructor.priority;
-            this.store[key] = { Key: key, Priority: priority + option.length, Service: new option(this) };
+            const key: UniqueID = option.prototype.constructor.key;
+            const priority: ServicePriority = option.prototype.constructor.priority;
+
+            this.store[key] = { Key: key, Priority: priority, Service: new option(this) };
         }
         catch(exception)
         {
@@ -48,26 +60,26 @@ export default class ServiceHub implements IServiceHub
         }
     }
 
-    public async getAsync<TService extends IService>(option: Function): Promise<TService>
+    public getAsync<TService extends IService>(option: Function): Promise<TService>
     {
         let service: TService = <TService>{};
 
         if('key' in option === false)
         {
             GlobalLogger.error('Object is not a service', option);
-            return service;
+            return Promise.resolve(service);
         }
 
-        service = await new Promise(async resolve => 
+        return new Promise(async resolve => 
         {
             let promService: TService | undefined = undefined;
 
-            while(promService === undefined)
+            while(promService === undefined || promService.isWork === false)
             {
                 try
                 {
-                    await WaitHelper.wait(10);
-                    const key: number = option.prototype.constructor.key;
+                    await AsyncHelper.wait(10);
+                    const key: UniqueID = option.prototype.constructor.key;
                     promService = <TService>this.store[key].Service;
                 }
                 catch(exception)
@@ -78,7 +90,5 @@ export default class ServiceHub implements IServiceHub
             
             resolve(promService);
         });
-
-        return service;
     }
 }

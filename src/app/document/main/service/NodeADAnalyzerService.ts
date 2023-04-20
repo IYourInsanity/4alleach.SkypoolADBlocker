@@ -1,6 +1,6 @@
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
 import WaitHelper from "../../../../common/helper/WaitHelper";
 import Guid from "../../../../common/model/Guid";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
 import NodeStorageService from "./NodeStorageService";
@@ -20,7 +20,8 @@ export default class NodeADAnalyzerService extends Service implements INodeADAna
 
     private static attrToCheck = ['id', 'class', 'alt', 'src', 'data', 'data-name'];
     
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 1;
 
     private storageService: INodeStorageService;
 

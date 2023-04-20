@@ -1,13 +1,14 @@
 import EventCallback from "../../../../common/custom/EventCallback";
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
 import Guid from "../../../../common/model/Guid";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../../framework/service/Service";
 import { StorageNode } from "../model/StorageNode";
 import INodeStorageService from "./abstraction/INodeStorageService";
 
 export default class NodeStorageService extends Service implements INodeStorageService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
 
     private stash: { [key: string]: StorageNode };
 

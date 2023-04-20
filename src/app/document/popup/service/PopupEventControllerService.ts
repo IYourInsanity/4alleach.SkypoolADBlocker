@@ -2,13 +2,14 @@ import { IEventMessage } from "../../../../framework/abstraction/IEventMessage";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import { EventCommandType } from "../../../../common/model/EventCommandType";
 import { BackendEventControllerService } from "../../service/BackendEventControllerService";
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
 import IPopupEventControllerService from "../abstraction/IPopupEventControllerService";
 import PopupMessageHandlerService from "./PopupMessageHandlerService";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 
 export default class PopupEventControllerService extends BackendEventControllerService<IEventMessage, chrome.runtime.Port> implements IPopupEventControllerService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
 
     constructor()
     {

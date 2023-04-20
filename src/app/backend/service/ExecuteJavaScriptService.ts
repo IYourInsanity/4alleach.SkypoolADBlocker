@@ -1,11 +1,12 @@
-import KeyGenerator from "../../../common/helper/KeyGenerator";
+import UniqueIDGenerator from "../../../framework/helper/UniqueIDGenerator";
 import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import Service from "../../../framework/service/Service";
 import IExecuteJavaScriptService from "./abstraction/IExecuteJavaScriptService";
 
 export default class ExecuteJavaScriptService extends Service implements IExecuteJavaScriptService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
 
     private world: chrome.scripting.ExecutionWorld;
 

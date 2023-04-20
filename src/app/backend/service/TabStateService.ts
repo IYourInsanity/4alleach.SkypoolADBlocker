@@ -8,12 +8,12 @@ import IMainScriptInstallService from "./abstraction/IMainScriptInstallService";
 import ITabStateService from "./abstraction/ITabStateService";
 import IUrlService from "./abstraction/IUrlService";
 import EventCallback from "../../../common/custom/EventCallback";
-import KeyGenerator from "../../../common/helper/KeyGenerator";
-import GlobalLogger from "../../../framework/logger/GlobalLogger";
+import UniqueIDGenerator from "../../../framework/helper/UniqueIDGenerator";
 
 export default class TabStateService extends Service implements ITabStateService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 1;
 
     private readonly tabs: { [key: number]: TabInfo };
 

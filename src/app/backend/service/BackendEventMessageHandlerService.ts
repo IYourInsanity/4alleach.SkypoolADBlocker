@@ -1,6 +1,6 @@
-import KeyGenerator from "../../../common/helper/KeyGenerator";
 import { EventCommandType } from "../../../common/model/EventCommandType";
 import { EventMessage, IEventMessage } from "../../../framework/abstraction/IEventMessage";
+import UniqueIDGenerator from "../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../framework/service/Service";
 import IServiceHub from "../../../framework/service/abstraction/IServiceHub";
 import BackendEventControllerService from "./BackendEventControllerService";
@@ -13,7 +13,8 @@ import ITabStateService from "./abstraction/ITabStateService";
 
 export default class BackendEventMessageHandlerService extends Service implements IBackendEventMessageHandlerService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 2;
     
     private tabService: ITabStateService;
     private eventController: IBackendEventControllerService;
@@ -73,6 +74,7 @@ export default class BackendEventMessageHandlerService extends Service implement
                 const tabId = sender.tab!.id!;
 
                 this.collectorDataService.set(tabId, message.Data);
+
                 const request = EventMessage.create(message.MessageId, EventCommandType.GetTabInformationForPopup, [message.Data], EventCommandType.MessageToPopup);
 
                 this.eventController.sendToExtension(request);

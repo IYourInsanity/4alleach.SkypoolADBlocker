@@ -3,11 +3,12 @@ import EventGenerator from "../../../../common/helper/EventGenerator";
 import { DocumentEventControllerService } from "../../service/DocumentEventControllerService"
 import IMainEventControllerService from "./abstraction/IMainEventControllerService";
 import { EventCommandType } from "../../../../common/model/EventCommandType";
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 
 export default class MainEventControllerService extends DocumentEventControllerService<IEventMessage, EventTarget | null> implements IMainEventControllerService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
 
     constructor()
     {

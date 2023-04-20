@@ -1,6 +1,6 @@
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
 import { EventCommandType } from "../../../../common/model/EventCommandType";
 import { EventMessage } from "../../../../framework/abstraction/IEventMessage";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 import GlobalLogger from "../../../../framework/logger/GlobalLogger";
 import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
@@ -12,7 +12,8 @@ import INodeStorageService from "./abstraction/INodeStorageService";
 
 export default class NodeADBlockerService extends Service implements INodeADBlockerService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 1;
 
     private storageService: INodeStorageService;
     private eventService: IMainEventControllerService;

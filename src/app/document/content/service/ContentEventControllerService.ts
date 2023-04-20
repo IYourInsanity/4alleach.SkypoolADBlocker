@@ -4,11 +4,12 @@ import { EventCommandType } from "../../../../common/model/EventCommandType";
 import ContentMessageHandlerService from "./ContentMessageHandlerService";
 import IContentEventControllerService from "./abstraction/IContentEventControllerService";
 import { BackendEventControllerService } from "../../service/BackendEventControllerService";
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 
 export default class ContentEventControllerService extends BackendEventControllerService<IEventMessage, EventTarget | chrome.runtime.Port | null> implements IContentEventControllerService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
     
     constructor()
     {

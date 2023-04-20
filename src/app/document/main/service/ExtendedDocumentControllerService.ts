@@ -7,11 +7,12 @@ import MainEventControllerService from "./MainEventControllerService";
 import IExtendedDocumentControllerService from "./abstraction/IExtendedDocumentControllerService";
 import IMainEventControllerService from "./abstraction/IMainEventControllerService";
 import WaitHelper from "../../../../common/helper/WaitHelper";
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 
 export default class ExtendedDocumentControllerService extends Service implements IExtendedDocumentControllerService
 {
-    public static readonly key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
 
     private extendedDocument: ExtendedDocument;
 

@@ -1,8 +1,8 @@
-import KeyGenerator from "../../../common/helper/KeyGenerator";
 import WaitHelper from "../../../common/helper/WaitHelper";
 import { EventCommandType } from "../../../common/model/EventCommandType";
 import { ICancellationToken } from "../../../framework/abstraction/ICancellationToken";
 import { IEventMessage, EventMessage } from "../../../framework/abstraction/IEventMessage";
+import UniqueIDGenerator from "../../../framework/helper/UniqueIDGenerator";
 import GlobalLogger from "../../../framework/logger/GlobalLogger";
 import { EventController } from "../../../framework/service/EventController";
 import { PortInfo } from "../model/connection/portInfo";
@@ -10,7 +10,8 @@ import IBackendEventControllerService from "./abstraction/IBackendEventControlle
 
 export default class BackendEventControllerService extends EventController<IEventMessage, chrome.runtime.MessageSender> implements IBackendEventControllerService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
     
     private readonly responseTimeout: number;
 
@@ -45,7 +46,7 @@ export default class BackendEventControllerService extends EventController<IEven
         chrome.runtime.onMessage.addListener(this.receive);
         chrome.tabs.onRemoved.addListener(this.onRemoved);
 
-        this.extensionKey = KeyGenerator.get(chrome.runtime.id);
+        this.extensionKey = UniqueIDGenerator.get(chrome.runtime.id);
 
         this.isWork = true;
     }
@@ -73,6 +74,11 @@ export default class BackendEventControllerService extends EventController<IEven
 
     public sendToExtension(message: IEventMessage): void
     {
+        if(this.portHub[this.extensionKey] === undefined)
+        {
+            return;
+        }
+        
         this.portHub[this.extensionKey][0].port.postMessage(message);
     }
 

@@ -1,11 +1,12 @@
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../../framework/service/Service";
 import IPopupPageRenderService from "../abstraction/IPopupPageRenderService";
 import NodeRenderManager from "../manager/NodeRenderManager";
 
 export default class PopupPageRenderService extends Service implements IPopupPageRenderService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
 
     private renderManager: NodeRenderManager;
 

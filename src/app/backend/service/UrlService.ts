@@ -1,10 +1,11 @@
-import KeyGenerator from "../../../common/helper/KeyGenerator";
+import UniqueIDGenerator from "../../../framework/helper/UniqueIDGenerator";
 import Service from "../../../framework/service/Service";
 import IUrlService from "./abstraction/IUrlService";
 
 export default class UrlService extends Service implements IUrlService
 {
-    public static key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
 
     private exceptUrls: string[];
 

@@ -7,7 +7,7 @@ export default abstract class Service implements IService
 
     protected readonly serviceHub: IServiceHub;
 
-    protected isWork: boolean;
+    public isWork: boolean;
 
     constructor(key: number, serviceHub?: IServiceHub)
     {

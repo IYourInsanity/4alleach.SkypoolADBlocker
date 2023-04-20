@@ -2,11 +2,12 @@ import Service from "../../../../framework/service/Service";
 import IServiceHub from "../../../../framework/service/abstraction/IServiceHub";
 import IWindowEventControllerService from "./abstraction/IWindowEventControllerService";
 import ExtendedDocument from "../../global/ExtendedDocument";
-import KeyGenerator from "../../../../common/helper/KeyGenerator";
+import UniqueIDGenerator from "../../../../framework/helper/UniqueIDGenerator";
 
 export default class WindowEventControllerService extends Service implements IWindowEventControllerService
 {
-    public static readonly key: number = KeyGenerator.new();
+    public static key: UniqueID = UniqueIDGenerator.new();
+    public static priority: ServicePriority = 0;
 
     private extendedDocument: ExtendedDocument;
 
