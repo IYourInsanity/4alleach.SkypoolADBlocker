@@ -22,13 +22,19 @@ export default class NodeStorageService extends Service implements INodeStorageS
         this.get = this.get.bind(this);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
-        this.isWork = true;
 
         this.stash = {};
         this.onSaved = new EventCallback<string>();
+
+        this.isWork = true;
+    }
+
+    public async reset(): Promise<void>
+    {
+        this.isWork = false;
     }
 
     public save(node: Node): void

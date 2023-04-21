@@ -18,13 +18,20 @@ export default class ContentEventControllerService extends BackendEventControlle
         this.receiveCustomEvent = this.receiveCustomEvent.bind(this);
     }
 
-    public override initialize(): void 
+    public override async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
 
         window.addEventListener(EventCommandType.MessageToContent, this.receiveCustomEvent);
 
         this.isWork = true;
+    }
+
+    public override async reset(): Promise<void> 
+    {
+        window.removeEventListener(EventCommandType.MessageToContent, this.receiveCustomEvent);
+
+        this.isWork = false;
     }
 
     protected override receive(message: IEventMessage, sender: EventTarget | chrome.runtime.Port | null): void 

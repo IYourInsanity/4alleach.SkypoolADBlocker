@@ -13,17 +13,21 @@ export default class UrlService extends Service implements IUrlService
     {
         super(UrlService.key);
 
-        this.initialize = this.initialize.bind(this);
         this.validate = this.validate.bind(this);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
 
         this.exceptUrls = ['chrome://', 'chrome-://', 'edge://', 'edge-://', 'data:', 'devtools://', 'about:blank', 'chrome-extension://', 'chrome-untrusted://'];
 
         this.isWork = true;
+    }
+
+    public async reset(): Promise<void>
+    {
+        this.isWork = false;
     }
 
     public validate(value: string | undefined): boolean

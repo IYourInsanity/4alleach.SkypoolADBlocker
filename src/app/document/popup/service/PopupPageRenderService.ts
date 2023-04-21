@@ -29,6 +29,13 @@ export default class PopupPageRenderService extends Service implements IPopupPag
         this.isWork = true;
     }
 
+    public override async reset(): Promise<void>
+    {
+        //TODO Implement reset logic for render manager
+
+        this.isWork = false;
+    }
+
     public updateData(data: PopupData): void 
     {
         if(data === undefined)

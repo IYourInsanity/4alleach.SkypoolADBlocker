@@ -17,13 +17,18 @@ export default class ExecuteJavaScriptService extends Service implements IExecut
         this.executeFileAsync = this.executeFileAsync.bind(this);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
 
         this.world = 'MAIN';
 
         this.isWork = true;
+    }
+
+    public async reset(): Promise<void>
+    {
+        this.isWork = false;
     }
 
     public async executeFileAsync<TResult>(tabId: number, frameId: number, fileName: string): Promise<TResult | undefined> 

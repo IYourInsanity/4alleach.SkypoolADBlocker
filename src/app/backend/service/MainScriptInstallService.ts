@@ -37,6 +37,11 @@ export default class MainScriptInstallService extends Service implements IMainSc
         this.isWork = true;
     }
 
+    public async reset(): Promise<void>
+    {
+        this.isWork = false;
+    }
+
     public async install(tabId: number, frameId: number): Promise<boolean>
     {
         const $this = this;

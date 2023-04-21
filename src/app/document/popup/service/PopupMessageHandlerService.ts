@@ -15,7 +15,7 @@ export default class PopupMessageHandlerService extends Service implements IPopu
     public static key: UniqueID = UniqueIDGenerator.new();
     public static priority: ServicePriority = 1;
 
-    private eventControllerService: IPopupEventControllerService;
+    private eventController: IPopupEventControllerService;
     private pageRenderService: IPopupPageRenderService;
 
     constructor(serviceHub: IServiceHub)
@@ -30,16 +30,26 @@ export default class PopupMessageHandlerService extends Service implements IPopu
     {
         if(this.isWork === true) return;
 
-        this.eventControllerService = await this.serviceHub.getAsync(PopupEventControllerService);
-        this.eventControllerService.add(PopupMessageHandlerService.key, this.receive);
+        this.eventController = await this.serviceHub.getAsync(PopupEventControllerService);
+        this.eventController.add(PopupMessageHandlerService.key, this.receive);
 
         this.pageRenderService = await this.serviceHub.getAsync(PopupPageRenderService);
 
         //TODO: Reworked init
         const message = EventMessage.new(EventCommandType.GetTabInformationForPopup, {}, EventCommandType.MessageToBackend);
-        this.eventControllerService.send(message);
+        this.eventController.send(message);
 
         this.isWork = true;
+    }
+
+    public override async reset(): Promise<void>
+    {
+        if(this.eventController?.remove !== undefined)
+        {
+            this.eventController.remove(PopupMessageHandlerService.key, this.receive);
+        }
+
+        this.isWork = false;
     }
 
     private async receive(message: IEventMessage, sender: EventTarget | chrome.runtime.Port | null): Promise<void> 
@@ -56,6 +66,6 @@ export default class PopupMessageHandlerService extends Service implements IPopu
 
     public send(message: IEventMessage): void
     {
-        this.eventControllerService.send(message);
+        this.eventController.send(message);
     }
 }

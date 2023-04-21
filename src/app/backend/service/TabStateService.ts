@@ -69,6 +69,18 @@ export default class TabStateService extends Service implements ITabStateService
         this.isWork = true;
     }
 
+    public async reset(): Promise<void>
+    {
+        chrome.tabs.onActivated.removeListener(this.onSwitched);
+        chrome.tabs.onCreated.removeListener(this.onCreated); 
+        chrome.tabs.onUpdated.removeListener(this.onUpdated);
+        chrome.tabs.onRemoved.removeListener(this.onRemoved);
+
+        chrome.webNavigation.onCommitted.removeListener(this.onCommited);
+
+        this.isWork = false;
+    }
+
     public getActiveTabInfo(): ActiveTabInfo 
     {
         return this.activeTabInfo;

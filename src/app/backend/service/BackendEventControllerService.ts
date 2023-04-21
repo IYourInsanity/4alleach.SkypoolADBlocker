@@ -38,7 +38,7 @@ export default class BackendEventControllerService extends EventController<IEven
         this.getKey = this.getKey.bind(this);
     }
 
-    public override initialize(): void 
+    public override async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
 
@@ -49,6 +49,15 @@ export default class BackendEventControllerService extends EventController<IEven
         this.extensionKey = UniqueIDGenerator.get(chrome.runtime.id);
 
         this.isWork = true;
+    }
+
+    public async reset(): Promise<void>
+    {
+        chrome.runtime.onConnect.removeListener(this.onConnect);
+        chrome.runtime.onMessage.removeListener(this.receive);
+        chrome.tabs.onRemoved.removeListener(this.onRemoved);
+
+        this.isWork = false;
     }
     
     protected override receive(message: IEventMessage, sender: chrome.runtime.MessageSender): void 

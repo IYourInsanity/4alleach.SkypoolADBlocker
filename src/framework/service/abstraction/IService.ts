@@ -4,5 +4,7 @@ export default interface IService
 
     isWork: boolean;
     
-    initialize(): void | Promise<void>;
+    initialize(): Promise<void>;
+
+    reset(): Promise<void>;
 }

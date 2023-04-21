@@ -15,12 +15,20 @@ export default class MainEventControllerService extends DocumentEventControllerS
         super(MainEventControllerService.key);
     }
 
-    public override initialize(): void 
+    public override async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
-        this.isWork = true;
-
+    
         window.addEventListener(EventCommandType.MessageToMain, this.receiveCustomEvent);
+
+        this.isWork = true;
+    }
+
+    public override async reset(): Promise<void> 
+    {
+        window.removeEventListener(EventCommandType.MessageToMain, this.receiveCustomEvent);
+
+        this.isWork = false;
     }
 
     protected override receive(message: IEventMessage, sender: EventTarget | null): void 

@@ -10,7 +10,7 @@ export default class MutationObserverService extends Service
     public static priority: ServicePriority = 2;
 
     private observer: MutationObserver;
-    private handlerService: INodeADAnalyzerService;
+    private analyzeService: INodeADAnalyzerService;
 
     constructor(serviceHub: IServiceHub)
     {
@@ -22,14 +22,20 @@ export default class MutationObserverService extends Service
     public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
-        this.isWork = true;
-
-        this.handlerService = await this.serviceHub.getAsync(NodeADAnalyzerService);
+        
+        this.analyzeService = await this.serviceHub.getAsync(NodeADAnalyzerService);
 
         this.observer = new MutationObserver(this.nodeMutation);
         this.observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
 
-        this.handlerService.handle(document.documentElement);
+        this.isWork = true;
+    }
+
+    public async reset(): Promise<void>
+    {
+        this.observer?.disconnect();
+
+        this.isWork = false;
     }
 
     private nodeMutation(records: MutationRecord[]): void
@@ -39,7 +45,7 @@ export default class MutationObserverService extends Service
         {
             const record = records[i];
             
-            this.handlerService.handle(record.target);
+            this.analyzeService.handle(record.target);
         }
     }
 }

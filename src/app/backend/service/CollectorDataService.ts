@@ -15,13 +15,18 @@ export default class CollectorDataService extends Service implements ICollectorD
         super(CollectorDataService.key);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
 
         this.stash = {};
 
         this.isWork = true;
+    }
+
+    public async reset(): Promise<void>
+    {
+        this.isWork = false;
     }
 
     public set(tabId: number, data: any): void 

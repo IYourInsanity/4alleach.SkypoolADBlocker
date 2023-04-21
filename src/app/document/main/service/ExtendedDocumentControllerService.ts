@@ -28,7 +28,6 @@ export default class ExtendedDocumentControllerService extends Service implement
     public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
-        this.isWork = true;
 
         this.extendedDocument = document as ExtendedDocument;
         this.extendedDocument.API = 
@@ -36,6 +35,13 @@ export default class ExtendedDocumentControllerService extends Service implement
             installFrame: this.installFrame,
             getFrameIdAsync: this.getFrameIdAsync
         };
+
+        this.isWork = true;
+    }
+
+    public async reset(): Promise<void> 
+    {
+        this.isWork = false;
     }
 
     private async installFrame(frameId: number): Promise<void>

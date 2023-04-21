@@ -51,6 +51,20 @@ export default class BackendEventMessageHandlerService extends Service implement
         this.isWork = true;
     }
 
+    public async reset(): Promise<void>
+    {
+        this.tabService?.OnTabCreated?.removeListener(this.onTabCreated);
+        this.tabService?.OnTabRemoved?.removeListener(this.onTabRemoved);
+        this.tabService?.OnTabCommited?.removeListener(this.onTabCommited);
+
+        if(this.eventController?.remove !== undefined)
+        {
+            this.eventController.remove(this.eventController.extensionKey, this.receive);
+        }
+
+        this.isWork = false;
+    }
+
     private receive(message: IEventMessage, sender: chrome.runtime.MessageSender): void
     {
         if(message.Direct !== EventCommandType.MessageToBackend)

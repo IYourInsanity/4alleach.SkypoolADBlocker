@@ -29,6 +29,16 @@ export default class ContentMessageHandlerService extends Service implements ICo
         this.eventController = await this.serviceHub.getAsync(ContentEventControllerService);
         this.eventController.add(ContentMessageHandlerService.key, this.receive);
     }
+
+    public async reset(): Promise<void> 
+    {
+        if(this.eventController?.remove !== undefined)
+        {
+            this.eventController.remove(ContentMessageHandlerService.key, this.receive);
+        }
+        
+        this.isWork = false;
+    }
     
     private receive(message: IEventMessage, sender: EventTarget | chrome.runtime.Port | null): void
     {

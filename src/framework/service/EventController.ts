@@ -64,18 +64,23 @@ export abstract class EventController<TData extends IEventMessage, TSender exten
         listener.splice(index, 1);
     }
 
-    public initialize(): void
+    public initialize(): Promise<void>
     {
-        throw new Error("Method not implemented.");
+        throw new Error("Method initialize not implemented.");
+    }
+
+    public reset(): Promise<void> 
+    {
+        throw new Error("Method reset not implemented.");
     }
 
     public send(value: TData): void
     {
-        throw new Error("Method not implemented.");
+        throw new Error("Method send not implemented.");
     }
 
     protected receive(value: TData, sender: TSender): void
     {
-        throw new Error("Method not implemented.");
+        throw new Error("Method receive not implemented.");
     }
 }

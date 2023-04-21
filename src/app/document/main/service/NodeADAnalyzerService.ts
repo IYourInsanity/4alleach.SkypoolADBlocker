@@ -53,6 +53,11 @@ export default class NodeADAnalyzerService extends Service implements INodeADAna
         this.isWork = true;
     }
 
+    public async reset(): Promise<void>
+    {
+        this.isWork = false;
+    }
+
     public handle(node: Node): void
     {
         if(node === undefined)

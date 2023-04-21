@@ -16,11 +16,17 @@ export default class WindowEventControllerService extends Service implements IWi
         super(WindowEventControllerService.key, serviceHub);
     }
 
-    public initialize(): void 
+    public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
-        this.isWork = true;
-
+        
         this.extendedDocument = document as ExtendedDocument;
+
+        this.isWork = true;
+    }
+
+    public async reset(): Promise<void>
+    {
+        this.isWork = false;
     }
 }

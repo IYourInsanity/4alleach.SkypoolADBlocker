@@ -28,11 +28,19 @@ export default class NodeADBlockerService extends Service implements INodeADBloc
     public async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
-        this.isWork = true;
 
         this.eventService = await this.serviceHub.getAsync(MainEventControllerService);
         this.storageService = await this.serviceHub.getAsync(NodeStorageService);
         this.storageService.onSaved.addListener(this.onSaved);
+
+        this.isWork = true;
+    }
+
+    public async reset(): Promise<void>
+    {
+        this.storageService?.onSaved?.removeListener(this.onSaved);
+
+        this.isWork = false;
     }
 
     private onSaved(key: string): void

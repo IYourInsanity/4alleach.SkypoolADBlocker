@@ -16,11 +16,16 @@ export default class PopupEventControllerService extends BackendEventControllerS
         super(PopupEventControllerService.key);
     }
 
-    public override initialize(): void 
+    public override async initialize(): Promise<void> 
     {
         if(this.isWork === true) return;
 
         this.isWork = true;
+    }
+
+    public override async reset(): Promise<void>
+    {
+        this.isWork = false;
     }
 
     protected override receive(message: IEventMessage, sender: chrome.runtime.Port): void 
